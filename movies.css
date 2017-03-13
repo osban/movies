@@ -1,0 +1,61 @@
+a {text-decoration: none}
+a.hover {color: #026989}
+
+input[type=checkbox] {height: 20px; width: 20px; margin-top: 3px}
+img {max-width: 300px}
+
+.navbar {padding: 5px 10px 5px 5px; background-color: #fff; border-top: 1px solid #222; border-bottom: 1px solid #222}
+.left {text-align: left}
+.center {text-align: center}
+.right {text-align: right}
+.labeltop {vertical-align: top}
+
+.sel {height: 28px; padding: 5px 10px; margin-left: 10px}
+
+.mtxx {margin-top: 20px}
+
+.mlx {margin-left: 10px}
+.mlxx {margin-left: 20px}
+.mlxxx {margin-left: 30px}
+
+.mrx {margin-right: 10px}
+.mrxx {margin-right: 20px}
+.mrxxx {margin-right: 30px}
+
+#listsearch {margin: 20px 20px 0 0}
+
+.zoek {margin: 20px 10px 10px 0px}
+.zoeki {margin: 20px 10px 10px 10px}
+.btnprev {margin-right: 10px}
+.btninvisp {margin-right: 10px; color: #fff; border-color: #fff; cursor: default}
+.btninvisp:hover {margin-right: 10px; color: #fff; border-color: #fff; cursor: default}
+.btninvisn {margin-right: 20px; color: #fff; border-color: #fff; cursor: default}
+.btninvisn:hover {margin-right: 10px; color: #fff; border-color: #fff; cursor: default}
+
+.viewratdisk {display: inline-block; width: 85px}
+.xmark {vertical-align: middle}
+
+.editlabel {display: inline-block; width: 90px; margin-right: 5px}
+.edittitle {width: 500px}
+.edittype {width: 65px}
+.editratmet {width: 48px; text-align: center}
+.editdisk {width: 42px; text-align: center}
+.editimgurl {width: 85%}
+#btndel {background-color: #cc2222; border-color: #aa2222}
+
+.season {margin: 0 35px 0 5px}
+
+.adddisk {width: 45px; text-align: center}
+
+.widthccc {width: 300px}
+.red {color: red}
+.green {color: green}
+
+#delok {display: none; position: absolute; top: 50%; left: 50%; width: 400px; height: 200px; margin-left: -200px; margin-top: -100px;
+        border: 3px solid #990000; border-radius: 8px; text-align: center; background-color: #ffffff; }
+#delok0 {display: inline-block; width: 99%; padding: 4px 0 4px 5px; font-size: smaller; text-align: left;
+          background-color: #990000; color: #ffffff}
+#delok1 {display: inline-block; padding-top: 36px}
+#delok2 {display: inline-block; padding-bottom: 30px; font-weight: bold}
+#delokok {border-color: green}
+#delokno {border-color: red}
