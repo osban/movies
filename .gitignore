@@ -18,30 +18,26 @@ $RECYCLE.BIN/
 *.lnk
 
 # =========================
-# Operating System Files
+# User additions
 # =========================
 
-# OSX
-# =========================
+.babelrc
+.env
 
-.DS_Store
-.AppleDouble
-.LSOverride
+*.bat
+server - oud.js
+server-controller.js
+server-model.js
+server-routes.js
 
-# Thumbnails
-._*
+movieadd-old.js
+xmark.png
 
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
+*.json
+*.zip
+ovpn*.*
+siimple*.*
+webpack.config.js
 
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+/data/*
+/node_modules/*
