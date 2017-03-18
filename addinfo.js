@@ -71,13 +71,13 @@ module.exports = {
           m('b', "disk: "),
           m('input.adddisk[type=text]', {
             onfocus: function() {this.select()},
-            oninput: m.withAttr('value', Movie.postdata.disk)}, Movie.postdata.disk()
+            onchange: m.withAttr('value', Movie.postdata.disk)}, Movie.postdata.disk()
           ),
 
           m('b.mlxx', "original title: "),
-          m('input.widthccc[type=text]', {
+          m('input.width280[type=text]', {
             onfocus: function() {this.select()},
-            oninput: m.withAttr('value', Movie.postdata.originaltitle)}, Movie.postdata.originaltitle()
+            onchange: m.withAttr('value', Movie.postdata.originaltitle)}, Movie.postdata.originaltitle()
           ),
 
           m('b.mlxx.labeltop', "seen: "),

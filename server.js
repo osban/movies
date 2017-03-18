@@ -4,8 +4,14 @@ require('dotenv').config()
 // import stuff
 const express = require('express'),
   app = express()
+const path = require('path')
+const compression = require('compression')
 const bodyParser = require('body-parser')
-const port = process.env.PORT || 8089
+
+const port = process.env.PORT || 8088
+
+// GZIP all assets
+app.use(compression())
 
 // connect to database
 const db = require('monk')(process.env.MOVIEDB_URI)
@@ -26,9 +32,12 @@ app.use((req, res, next) => {
   next()
 })
 
+// set path
+app.use(express.static(path.join(__dirname, '/')))
+
 // routes
 app.get('/', (req, res) => {
-  res.send("This is where Oscar's small Movie Database app hides!")
+  res.sendFile('index.html')
 })
 
 app.get('/getall', (req, res) => {
@@ -57,5 +66,5 @@ app.delete('/delete/:id', (req, res) => {
 
 // start server
 app.listen(port, () => {
-  console.log(`Oscar's small imdb app is listening at ${port}`)
+  console.log(`Oscar's small imdb app is listening at port ${port}`)
 })

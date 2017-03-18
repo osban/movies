@@ -22,7 +22,7 @@ const Movie = {
   loadlist() {
     return m.request({
       method: "GET",
-      url: "http://192.168.178.20:8089/getall"
+      url: "/getall"
     })
     .then(result => {
       Movie.list = result
@@ -54,7 +54,6 @@ const Movie = {
   error: "",
   state: "",
   geteps(id) {
-    //let url = "http://192.168.178.20:8089/getqueryeps/" + id
     let url = "http://www.omdbapi.com/?i=" + id
     return m.request({
       method: "GET",
@@ -69,7 +68,6 @@ const Movie = {
   getquery(name) {
     Movie.searching = "Searching..."
     Movie.error = ""
-    // let url = "http://192.168.178.20:8089/getquery/" + name
     let url = "http://www.omdbapi.com/?s=" + name
     return m.request({
       method: "GET",
@@ -93,7 +91,6 @@ const Movie = {
   getqueryid(id) {
     Movie.searching = "Searching..."
     Movie.error = ""
-    //let url = "http://192.168.178.20:8089/getqueryid/" + id
     let url = "http://www.omdbapi.com/?i=" + id
     return m.request({
       method: "GET",
@@ -158,7 +155,7 @@ const Movie = {
     Movie.postdata.imdburl = "https://www.imdb.com/title/" + Movie.current.imdbID
     return m.request({
       method: "POST",
-      url: "http://192.168.178.20:8089/post",
+      url: "/post",
       data: Movie.postdata
     })
     .then(() => {
@@ -173,7 +170,7 @@ const Movie = {
 
   updated: false,
   putmovie(id) {
-    let url = "http://192.168.178.20:8089/put/" + id
+    let url = "/put/" + id
     return m.request({
       method: "PUT",
       url: url,
@@ -184,7 +181,7 @@ const Movie = {
     })
   },
   delmovie(id) {
-    let url = "http://192.168.178.20:8089/delete/" + id
+    let url = "/delete/" + id
     return m.request({
       method: "DELETE",
       url: url,
