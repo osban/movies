@@ -3,6 +3,7 @@ import m from "mithril"
 import s from "mithril/stream"
 
 const Model = {
+  omdbapi: "",
   pointer: null,
   list: [],
   filterlist: [],
@@ -31,7 +32,8 @@ const Model = {
       url: "/getall"
     })
     .then(result => {
-      Model.list = result
+      Model.list = result.list
+      Model.omdbapi = result.omdbapi
       // sort on title
       Model.list.sort((a, b) => {
         return a.title.toLowerCase() > b.title.toLowerCase() ? 1 : a.title.toLowerCase() < b.title.toLowerCase() ? -1 : 0
@@ -59,7 +61,7 @@ const Model = {
   geteps: id => {
     m.request({
       method: "GET",
-      url: "http://www.omdbapi.com/?i=" + id
+      url: "http://www.omdbapi.com/?i=" + id + "&apikey=" + Model.omdbapi
     })
     .then(result => Model.cureps = result)
   },
@@ -68,9 +70,9 @@ const Model = {
   getquery: name => {
     Model.searching = "Searching..."
     Model.error = ""
-    return m.request({
+    m.request({
       method: "GET",
-      url: "http://www.omdbapi.com/?s=" + name + "&apikey=578e3620"
+      url: "http://www.omdbapi.com/?s=" + name + "&apikey=" + Model.omdbapi
     })
     .then(result => {
       Model.current = result
@@ -89,7 +91,7 @@ const Model = {
     Model.error = ""
     m.request({
       method: "GET",
-      url: "http://www.omdbapi.com/?i=" + id + "&apikey=578e3620"
+      url: "http://www.omdbapi.com/?i=" + id + "&apikey=" + Model.omdbapi
     })
     .then(result => {
       Model.current = result

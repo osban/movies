@@ -22,10 +22,12 @@ const ViewSeries = {
                   m('a', {onclick: () => Model.showeps = i}, "Season " + Number(i+1))
                 ),
                 m('td',
-                  m('span', item ? m('img', {src: 'checkmark-16.png'}) : m('img.xmark', {src: 'xmark-16.png'}))
+                  m('span', item ? m('img', {src: 'images/checkmark-16.png'}) : m('img.xmark', {src: 'images/xmark-16.png'}))
                 ),
                 m('td',
-                  m('span', Model.current.seasonsseen[i] ? m('img', {src: 'checkmark-16.png'}) : m('img.xmark', {src: 'xmark-16.png'}))
+                  m('span', Model.current.seasonsseen[i]
+                    ? m('img', {src: 'images/checkmark-16.png'}) 
+                    : m('img.xmark', {src: 'images/xmark-16.png'}))
                 )
               )
             ])

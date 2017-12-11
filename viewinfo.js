@@ -76,7 +76,7 @@ const ViewInfo = {
                   m('span', Model.current.disk)
                 ),
                 m('b', "seen: "),
-                Model.current.seen ? m('img', {src: 'checkmark-16.png'}) : m('img.xmark', {src: 'xmark-16.png'}),
+                Model.current.seen ? m('img', {src: 'images/checkmark-16.png'}) : m('img.xmark', {src: 'images/xmark-16.png'}),
                 m('br'),
                 m('b', "notes: "),
                 m('span', Model.current.notes)

@@ -141,7 +141,7 @@ const List = {
               m('td', Model.type),
               m('td', Model.genres),
               m('td.right', Model.disk),
-              m('td.center', Model.seen ? m('img', {src: 'checkmark-16.png'}) : m('img.xmark', {src: 'xmark-16.png'}))
+              m('td.center', Model.seen ? m('img', {src: 'images/checkmark-16.png'}) : m('img.xmark', {src: 'images/xmark-16.png'}))
             )
           ])
         )

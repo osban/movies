@@ -2,8 +2,8 @@
 require('dotenv').config()
 
 // import stuff
-const express = require('express'),
-  app = express()
+const express = require('express')
+const app = express()
 const path = require('path')
 const compression = require('compression')
 const bodyParser = require('body-parser')
@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 
 app.get('/getall', (req, res) => {
   movies.find({})
-  .then(items => res.send(items))
+  .then(items => res.send({list: items, omdbapi: process.env.OMDBAPI}))
   .catch(err => res.send(err))
 })
 

@@ -5,7 +5,7 @@ const Layout = {
     m('div.container',
 			m('div.row',
         m('div.twelve columns',
-				  m('img', {src: 'movies.png'})
+				  m('img', {src: 'images/movies.png'})
         )
 			),
       m('div.row',
