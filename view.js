@@ -1,70 +1,74 @@
 import m from "mithril"
 import s from "mithril/stream"
-import Movie from "./model"
-import viewinfo from "./viewinfo"
+import Model from "./model"
+import ViewInfo from "./viewinfo"
 
-const MovieView = {
-  findmovie(zoek) {
-    Movie.current = Movie.list.find((item, i) => {
-      item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1 ? Movie.pointer = i : null
+const View = {
+  findModel: zoek => {
+    Model.current = Model.list.find((item, i) => {
+      if (item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1) Model.pointer = i
         return item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1
     })
-    Movie.current.seasons > 0 ? Movie.showeps = -1 : null
+    if (Model.current.seasons > 0) Model.showeps = -1
   },
 
-  prevnext(porn) {
-    if (porn == "prev") {
-      Movie.current = Movie.list[Movie.pointer - 1]
-      Movie.pointer--
-    } else {
-      Movie.current = Movie.list[Movie.pointer + 1]
-      Movie.pointer++
+  prevnext: porn => {
+    if (porn === "prev") {
+      Model.current = Model.list[Model.pointer - 1]
+      Model.pointer--
     }
-    Movie.current.seasons > 0 ? Movie.showeps = -1 : null
+    else {
+      Model.current = Model.list[Model.pointer + 1]
+      Model.pointer++
+    }
+    if (Model.current.seasons > 0) Model.showeps = -1
   },
 
-  oninit(vnode) {
-    this.zoekterm = s("")
+  oninit: ({state, attrs}) => {
+    state.zoekterm = s("")
 
     // If reload, go to list page
-    !Movie.list[0] ? m.route.set("/") : null
+    if (!Model.list.length) m.route.set("/")
 
-    // find specific movie or load first one
-    if (vnode.attrs.id === "0") {
-      Movie.current = Movie.list[0]
-    } else {
-      Movie.current = Movie.list.find((item, i) => {
-          item._id == vnode.attrs.id ? Movie.pointer = i : null
-          return item._id == vnode.attrs.id
+    // find specific Model or load first one
+    if (attrs.id === "0") Model.current = Model.list[0]
+    else {
+      Model.current = Model.list.find((item, i) => {
+        if (item._id === attrs.id) Model.pointer = i
+        return item._id === attrs.id
       })
     }
-    Movie.list[0] && Movie.current.seasons > 0 ? Movie.showeps = -1 : null
-    Movie.list[0] && Movie.current.year ? Movie.year = "(" + Movie.current.year + ")" : Movie.year = ""
+    if (Model.list.length && Model.current.seasons > 0) Model.showeps = -1
+    Model.list[0] && Model.current.year ? Model.year = "(" + Model.current.year + ")" : Model.year = ""
   },
-  onbeforeupdate() {
-    Movie.current.year ? Movie.year = "(" + Movie.current.year + ")" : Movie.year = ""
+
+  onbeforeupdate: () => {
+    Model.current.year ? Model.year = "(" + Model.current.year + ")" : Model.year = ""
   },
-  view(vnode) {
-    return m('div',
+
+  view: ({state}) => [
+    m('div',
       m('div.row',
         m('div.twelve columns',
-          m('input.zoek[type=text][placeholder="find by name"]', {
-            onfocus: function() {this.select()},
-            oninput: m.withAttr('value', this.zoekterm),
-            onchange: () => {this.zoekterm() != "" ? MovieView.findmovie(this.zoekterm()) : null}
+          m('input.zoek', {
+            type: 'text',
+            placeholder: "find by name",
+            onfocus: e => e.target.select(),
+            oninput: m.withAttr('value', state.zoekterm),
+            onchange: () => {if (state.zoekterm() !== "") ModelView.findModel(state.zoekterm())}
           }),
-          Movie.pointer > 0 ? m('button.btnprev', {
-            onclick: () => {MovieView.prevnext("prev")}}, "PREV") :
-            m('button.btninvisp[disabled]', "PREV"),
-          Movie.pointer < Movie.list.length - 1 ? m('button.mrxx', {
-            onclick: () => {MovieView.prevnext("next")}}, "NEXT") :
-            m('button.btninvisn[disabled]', "NEXT"),
-          m('button.button-primary', {onclick: () => {m.route.set("/edit/" + Movie.current._id)}}, "EDIT")
+          Model.pointer > 0
+          ? m('button.btnprev', {onclick: () => View.prevnext("prev")}, "PREV")
+          : m('button.btninvisp[disabled]', "PREV"),
+          Model.pointer < Model.list.length - 1
+          ? m('button.mrxx', {onclick: () => View.prevnext("next")}, "NEXT")
+          : m('button.btninvisn[disabled]', "NEXT"),
+          m('button.button-primary', {onclick: () => m.route.set("/edit/" + Model.current._id)}, "EDIT")
         )
       ),
-      !Movie.current ? (m('div.row.mtxx', m('h2', "Nothing found"))) : m(viewinfo)
+      !Model.current ? (m('div.row.mtxx', m('h2', "Nothing found"))) : m(ViewInfo)
     )
-  }
+  ]
 }
 
-module.exports = MovieView
+export default View

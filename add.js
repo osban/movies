@@ -1,37 +1,59 @@
 import m from "mithril"
 import s from "mithril/stream"
-import Movie from "./model"
-import addinfo from "./addinfo"
-import addlist from "./addlist"
+import Model from "./model"
+import AddInfo from "./addinfo"
+import AddList from "./addlist"
 
-module.exports = {
-  oninit() {
-    this.zoekterm = s("")
-    this.zoektermi = s("")
+const Add = {
+  oninit: ({state}) => {
+    state.zoekterm = s("")
+    state.zoektermi = s("")
+    Model.state = ""
 
     // If reload, go to list page
-    !Movie.list[0] ? m.route.set("/") : null
+    if (!Model.list.length) m.route.set("/")
   },
 
-  view() {
-    return m('div',
+  view: ({state}) => [
+    m('div',
       m('div.row',
         m('div.twelve columns',
-          m('input.zoek[type=text][placeholder="find"]', {
-            onfocus: function() {this.select(); Movie.added = false},
-            oninput: m.withAttr('value', this.zoekterm),
-            onchange: () => {this.zoekterm() != "" ? Movie.getquery(this.zoekterm()) : null}
+          m('input.zoek', {
+            type: 'text',
+            placeholder: "find",
+            onfocus: e => {e.target.select(); Model.added = false},
+            oninput: m.withAttr('value', state.zoekterm),
+            onkeypress: e => {
+              if (e.keyCode === 13 && state.zoekterm() !== "") {
+                Model.getquery(state.zoekterm())
+                e.target.blur()
+              }
+            },
+            onchange: () => {if (state.zoekterm() !== "") Model.getquery(state.zoekterm())}
           }),
-          m('input.zoeki[type=text][placeholder="find by id"]', {
-            onfocus: function() {this.select(); Movie.added = false},
-            oninput: m.withAttr('value', this.zoektermi),
-            onchange: () => {this.zoektermi() != "" ? Movie.getqueryid(this.zoektermi()) : null}
+          m('input.zoeki', {
+            type: 'text',
+            placeholder: "find by id",
+            onfocus: e => {e.target.select(); Model.added = false},
+            oninput: m.withAttr('value', state.zoektermi),
+            onkeypress: e => {
+              if (e.keyCode === 13 && state.zoektermi() !== "") {
+                Model.getqueryid(state.zoektermi())
+                e.target.blur()
+              }
+            },
+            onchange: () => {if (state.zoektermi() !== "") Model.getqueryid(state.zoektermi())}
           }),
-          Movie.added ? m('b.red', "Movie added!") : m('b.green', Movie.searching)
+          Model.added ? m('b.red', "Movie added!") : m('b.green', Model.searching)
         )
       ),
-      Movie.state === "error" ? (m('div.row.mtxx', m('h2', Movie.error))) : Movie.state === "found" ? m(addinfo) :
-      Movie.state === "list" ? m(addlist) : null
+      Model.state === "error"
+      ? (m('div.row.mtxx', m('h2', Model.error)))
+      : Model.state === "found"
+        ? m(AddInfo)
+        : Model.state === "list" && m(AddList)
     )
-  }
+  ]
 }
+
+export default Add

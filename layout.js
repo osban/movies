@@ -1,33 +1,37 @@
 import m from "mithril"
 
-module.exports = {
-  view(vnode) {
-    return m('div.container',
+const Layout = {
+  view: vnode => [
+    m('div.container',
 			m('div.row',
         m('div.twelve columns',
-				  m('img[src=movies.png]')
+				  m('img', {src: 'movies.png'})
         )
 			),
       m('div.row',
         m('div.twelve columns',
-          m('a[href="/"].navbar', {
+          m('a.navbar', {
+            href: '/',
             oncreate: m.route.link,
-            onclick: function() {this.blur()}
+            onclick: e => e.target.blur()
           }, "Home"),
 
-          m('a[href="/view/0"].navbar', {
+          m('a.navbar', {
+            href: '/view/0',
             oncreate: m.route.link,
-            onclick: function() {this.blur()}
+            onclick: e => e.target.blur()
           }, "View"),
 
-          m('a[href="/edit/0"].navbar', {
+          m('a.navbar', {
+            href: '/edit/0',
             oncreate: m.route.link,
-            onclick: function() {this.blur()}
+            onclick: e => e.target.blur()
           }, "Edit"),
 
-          m('a[href="/add/"].navbar', {
+          m('a.navbar', {
+            href: '/add',
             oncreate: m.route.link,
-            onclick: function() {this.blur()}
+            onclick: e => e.target.blur()
           }, "Add")
         )
       ),
@@ -35,5 +39,7 @@ module.exports = {
         m('section', vnode.children)
       )
     )
-  }
+  ]
 }
+
+export default Layout

@@ -1,32 +1,14 @@
-// import stuff
-import m from "mithril"
+import m from 'mithril'
 
-import Layout from "./layout"
-import MovieList from "./list"
-import MovieView from "./view"
-import MovieEdit from "./edit"
-import MovieAdd from "./add"
+import Layout from './layout'
+import List from './list'
+import View from './view'
+import Edit from './edit'
+import Add from './add'
 
-// routes
-m.route(document.body, "/", {
-  "/": {
-    render() {
-      return m(Layout, m(MovieList))
-    }
-  },
-  "/view/:id": {
-    render(vnode) {
-      return m(Layout, m(MovieView, vnode.attrs))
-    }
-  },
-  "/edit/:id": {
-    render(vnode) {
-      return m(Layout, m(MovieEdit, vnode.attrs))
-    }
-  },
-  "/add/": {
-    render() {
-      return m(Layout, m(MovieAdd))
-    }
-  }
+m.route(document.body, '/', {
+  '/'         : {render: () => m(Layout, m(List))},
+  '/view/:id' : {render: vnode => m(Layout, m(View, vnode.attrs))},
+  '/edit/:id' : {render: vnode => m(Layout, m(Edit, vnode.attrs))},
+  '/add'      : {render: () => m(Layout, m(Add))}
 })

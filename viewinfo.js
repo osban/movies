@@ -1,97 +1,95 @@
 import m from "mithril"
-import Movie from "./model"
-import viewseries from "./viewseries"
+import Model from "./model"
+import ViewSeries from "./viewseries"
 
-const viewinfo = {
-  mm2hm(minraw) {
-    let min = Number(minraw)
+const ViewInfo = {
+  mm2hm: minraw => {
+    const min = Number(minraw)
     let time = ""
-    if (min != 0) {
-      let hh = Math.floor(min/60)
+    if (min !== 0) {
+      const hh = min / 60 | 0
       let mm = min % 60
-      mm < 10 ? mm = "0" + mm : null
+      if (mm < 10) mm = "0" + mm
       time = `${hh}:${mm}`
-    } else {
-      time = ""
     }
+    else time = ""
+
     return time
   },
 
-  view() {
-    return m('div',
+  view: () => [
+    m('div',
       m('div.row.mtxx',
         m('div.eight columns',
-          m('h3', `${Movie.current.title} ${Movie.year}`),
+          m('h3', `${Model.current.title} ${Model.year}`),
           m('p',
             m('label', "plot:"),
-            m('span', Movie.current.plot)
+            m('span', Model.current.plot)
           ),
           m('p',
             m('b', "director: "),
-            m('span', Movie.current.director)
+            m('span', Model.current.director)
           ),
           m('p',
             m('b', "writer: "),
-            m('span', Movie.current.writer),
+            m('span', Model.current.writer),
             m('br'),
             m('b', "cast: "),
-            m('span', Movie.current.cast)
+            m('span', Model.current.cast)
           ),
           m('div.row',
             m('div.one-half column',
               m('p',
                 m('b', "country: "),
-                m('span', Movie.current.country),
+                m('span', Model.current.country),
                 m('br'),
                 m('b', "languages: "),
-                m('span', Movie.current.languages),
+                m('span', Model.current.languages),
                 m('br'),
                 m('b', "original title: "),
-                m('span', Movie.current.originaltitle),
+                m('span', Model.current.originaltitle),
                 m('br'),
                 m('b', "runtime: "),
-                m('span', viewinfo.mm2hm(Movie.current.runtime)),
+                m('span', ViewInfo.mm2hm(Model.current.runtime)),
                 m('br'),
                 m('b', "genres: "),
-                m('span', Movie.current.genres),
+                m('span', Model.current.genres),
                 m('br'),
                 m('b', "type: "),
-                m('span', Movie.current.type)
+                m('span', Model.current.type)
               )
             ),
             m('div.one-half column',
               m('p',
                 m('div.viewratdisk',
                   m('b', "rating: "),
-                  m('span', Movie.current.rating)
+                  m('span', Model.current.rating)
                 ),
                 m('b', "metascore: "),
-                m('span', Movie.current.metascore),
+                m('span', Model.current.metascore),
                 m('br'),
                 m('b', "imdb: "),
-                m('a', {href: Movie.current.imdburl, target: "_blank"}, Movie.current.imdburl),
+                m('a', {href: Model.current.imdburl, target: "_blank"}, Model.current.imdburl),
                 m('br'),
                 m('div.viewratdisk',
                   m('b', "disk: "),
-                  m('span', Movie.current.disk)
+                  m('span', Model.current.disk)
                 ),
                 m('b', "seen: "),
-                Movie.current.seen ? m('img[src=checkmark-16.png]') :
-                  m('img[src=xmark-16.png].xmark'),
+                Model.current.seen ? m('img', {src: 'checkmark-16.png'}) : m('img.xmark', {src: 'xmark-16.png'}),
                 m('br'),
                 m('b', "notes: "),
-                m('span', Movie.current.notes)
+                m('span', Model.current.notes)
               )
             )
           )
         ),
         m('div.four columns.widthccc',
-          m('img', {src: Movie.current.poster})
+          m('img', {src: Model.current.poster})
         )
       ),
-      m('div.row', Movie.current.seasons > 0 ? m(viewseries) : null)
+      m('div.row', Model.current.seasons > 0 && m(ViewSeries))
     )
-  }
+  ]
 }
-
-module.exports = viewinfo
+export default ViewInfo

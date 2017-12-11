@@ -1,47 +1,47 @@
 import m from "mithril"
-import Movie from "./model"
+import Model from "./model"
 
-const editseries = {
-  view() {
-    return m('div',
+const EditSeries = {
+  view: () => [
+    m('div',
       m('b', "owned:"),
       m('br'),
-      Movie.current.seasonsowned.map((item, i) => {
-        let season = i+1
-        return m('span',
-          m('input[type=checkbox]', {
-            name: season,
-            checked: Movie.current.seasonsowned[i],
-            onchange: () => {Movie.current.seasonsowned[i] = !Movie.current.seasonsowned[i]}}
+      Model.current.seasonsowned.map((item, i) => [
+        m('span',
+          m('input', {
+            type: 'checkbox',
+            name: i+1,
+            checked: Model.current.seasonsowned[i],
+            onchange: () => {Model.current.seasonsowned[i] = !Model.current.seasonsowned[i]}}
           ),
-          m('b.season.labeltop', "Season " + season)
+          m('b.season.labeltop', "Season " + i+1)
         )
-      }),
+      ]),
       m('br'),
       m('b', "seen:"),
       m('br'),
-      Movie.current.seasonsseen.map((item, i) => {
-        let season = i+1
-        return m('span',
-          m('input[type=checkbox]', {
-            name: season,
-            checked: Movie.current.seasonsseen[i],
-            onchange: () => {Movie.current.seasonsseen[i] = !Movie.current.seasonsseen[i]}}
+      Model.current.seasonsseen.map((item, i) => [
+        m('span',
+          m('input', {
+            type: 'checkbox',
+            name: i+1,
+            checked: Model.current.seasonsseen[i],
+            onchange: () => {Model.current.seasonsseen[i] = !Model.current.seasonsseen[i]}}
           ),
-          m('b.season.labeltop', "Season " + season)
+          m('b.season.labeltop', "Season " + i+1)
         )
-      }),
+      ]),
       m('br'),
       m('button#add', {
-        onclick: () => {Movie.current.seasonsowned.push(false); Movie.current.seasonsseen.push(false); Movie.current.seasons++}},
+        onclick: () => {Model.current.seasonsowned.push(false); Model.current.seasonsseen.push(false); Model.current.seasons++}},
         "Add season"
       ),
       m('button', {
-        onclick: () => {Movie.current.seasonsowned.pop(); Movie.current.seasonsseen.pop(); Movie.current.seasons--}},
+        onclick: () => {Model.current.seasonsowned.pop(); Model.current.seasonsseen.pop(); Model.current.seasons--}},
         "Remove season"
       )
     )
-  }
+  ]
 }
 
-module.exports = editseries
+export default EditSeries

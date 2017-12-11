@@ -1,32 +1,36 @@
 import m from "mithril"
-import Movie from "./model"
+import Model from "./model"
 
-const addseries = {
-  initseasons() {
-    Movie.postdata.seasonsowned = Array(Number(Movie.current.totalSeasons)).fill(false)
-    Movie.postdata.seasonsseen = Array(Number(Movie.current.totalSeasons)).fill(false)
-    Movie.postdata.seasons = Number(Movie.current.totalSeasons)
+const AddSeries = {
+  initseasons: () => {
+    Model.postdata.seasonsowned = Array(Number(Model.current.totalSeasons)).fill(false)
+    Model.postdata.seasonsseen = Array(Number(Model.current.totalSeasons)).fill(false)
+    Model.postdata.seasons = Number(Model.current.totalSeasons)
   },
 
-  oninit() {
-    addseries.initseasons()
-    Movie.initseasons = false
+  oninit: () => {
+    AddSeries.initseasons()
+    Model.initseasons = false
   },
 
-  onbeforeupdate() {
-    Movie.initseasons ? (addseries.initseasons(), Movie.initseasons = false) : null
+  onbeforeupdate: () => {
+    if (Model.initseasons) {
+      AddSeries.initseasons()
+      Model.initseasons = false
+    }
   },
 
-  view() {
-    return m('div',
+  view: () => [
+    m('div',
       m('b', "owned:"),
       m('br'),
-      Movie.postdata.seasonsowned.map((item, season) => {
+      Model.postdata.seasonsowned.map((item, season) => {
         season++
         return m('span',
-          m('input[type=checkbox]', {
+          m('input', {
+            type: 'checkbox',
             name: season,
-            onchange: function() {Movie.checkseasonsowned(this.checked, this.name)}}
+            onchange: function() {Model.checkseasonsowned(this.checked, this.name)}}
           ),
           m('b.season.labeltop', "Season " + season)
         )
@@ -34,18 +38,18 @@ const addseries = {
       m('br'),
       m('b', "seen:"),
       m('br'),
-      Movie.postdata.seasonsseen.map((item, season) => {
+      Model.postdata.seasonsseen.map((item, season) => {
         season++
         return m('span',
-          m('input[type=checkbox]', {
+          m('input', {
+            type: 'checkbox',
             name: season,
-            onchange: function() {Movie.checkseasonsseen(this.checked, this.name)}}
+            onchange: function() {Model.checkseasonsseen(this.checked, this.name)}}
           ),
           m('b.season.labeltop', "Season " + season)
         )
       })
     )
-  }
+  ]
 }
-
-module.exports = addseries
+export default AddSeries

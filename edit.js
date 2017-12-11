@@ -1,59 +1,63 @@
 import m from "mithril"
 import s from "mithril/stream"
-import Movie from "./model"
-import editinfo from "./editinfo"
+import Model from "./model"
+import EditInfo from "./editinfo"
 
-const MovieEdit = {
-  findmovie(zoek) {
-    Movie.current = Movie.list.find((item, i) => {
-      item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1 ? Movie.pointer = i : null
-        return item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1
+const Edit = {
+  findmovie: zoek => {
+    Model.current = Model.list.find((item, i) => {
+      if (item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1) Model.pointer = i
+      return item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1
     })
   },
 
-  oninit(vnode) {
-    this.zoekterm = s("")
+  oninit: ({state, attrs}) => {
     // If reload, go to list page
-    !Movie.list[0] ? m.route.set("/") : null
-
+    if (!Model.list.length) m.route.set("/")
+    state.zoekterm = s("")
     // find specific movie or load first one
-    if (vnode.attrs.id === "0") {
-      Movie.current = Movie.list[0]
-    } else {
-      Movie.current = Movie.list.find((item, i) => {
-          item._id == vnode.attrs.id ? Movie.pointer = i : null
-          return item._id == vnode.attrs.id
+    if (attrs.id === "0") Model.current = Model.list[0]
+    else {
+      Model.current = Model.list.find((item, i) => {
+        if (item._id === attrs.id) Model.pointer = i
+        return item._id === attrs.id
       })
     }
-    Movie.list[0] && Movie.current.year ? Movie.year = "(" + Movie.current.year + ")" : Movie.year = ""
+    Model.list[0] && Model.current.year ? Model.year = "(" + Model.current.year + ")" : Model.year = ""
   },
 
-  onbeforeupdate() {
-    Movie.current.year ? Movie.year = "(" + Movie.current.year + ")" : Movie.year = ""
+  onbeforeupdate: () => {
+    Model.current.year ? Model.year = "(" + Model.current.year + ")" : Model.year = ""
   },
 
-  view(vnode) {
-    return m('div',
+  view: ({state}) => [
+    m('div',
       m('div.row',
         m('div.twelve columns',
-          m('input.zoek[type=text][placeholder="find by name"]', {
-            onfocus: function() {this.select(); Movie.updated = false; Movie.deleted = false},
-            oninput: m.withAttr('value', this.zoekterm),
-            onchange: () => {this.zoekterm() != "" ? MovieEdit.findmovie(this.zoekterm()) : null}
+          m('input.zoek', {
+            type: 'text',
+            placeholder: "find by name",
+            onfocus: e => {e.target.select(); Model.updated = false; Model.deleted = false},
+            oninput: m.withAttr('value', state.zoekterm),
+            onchange: () => {if (state.zoekterm() !== "") MovieEdit.findmovie(state.zoekterm())}
           }),
-          Movie.pointer > 0 ? m('button.btnprev', {
-            onclick: () => {Movie.current = Movie.list[Movie.pointer - 1]; Movie.pointer--}}, "PREV") :
-            m('button.btninvisp[disabled]', "PREV"),
-          Movie.pointer < Movie.list.length - 1 ? m('button.mrxx', {
-            onclick: () => {Movie.current = Movie.list[Movie.pointer + 1]; Movie.pointer++}}, "NEXT") :
-            m('button.btninvisn[disabled]', "NEXT"),
-          Movie.updated ? m('b.red', "Movie updated!") : null,
-          Movie.deleted ? m('b.red', "Movie deleted!") : null
+          Model.pointer > 0
+          ? m('button.btnprev', {
+              onclick: () => {Model.current = Model.list[Model.pointer - 1]; Model.pointer--}
+            }, "PREV")
+          : m('button.btninvisp[disabled]', "PREV"),
+          Model.pointer < Model.list.length - 1
+          ? m('button.mrxx', {
+              onclick: () => {Model.current = Model.list[Model.pointer + 1]; Model.pointer++}
+            }, "NEXT")
+          : m('button.btninvisn[disabled]', "NEXT"),
+          Model.updated && m('b.red', "Movie updated!"),
+          Model.deleted && m('b.red', "Movie deleted!")
         )
       ),
-      !Movie.current ? (m('div.row.mtxx', m('h2', "Nothing found"))) : m(editinfo)
+      !Model.current ? (m('div.row.mtxx', m('h2', "Nothing found"))) : m(EditInfo)
     )
-  }
+  ]
 }
 
-module.exports = MovieEdit
+export default Edit

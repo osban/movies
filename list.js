@@ -1,185 +1,117 @@
 import m from "mithril"
 import s from "mithril/stream"
-import Movie from "./model"
+import Model from "./model"
 
-const MovieList = {
-  mm2hm(minraw) {
-    let min = Number(minraw)
+const List = {
+  mm2hm: minraw => {
+    const min = Number(minraw)
     let time = ""
-    if (min != 0) {
-      let hh = Math.floor(min/60)
+    if (min !== 0) {
+      const hh = min / 60 | 0
       let mm = min % 60
-      mm < 10 ? mm = "0" + mm : null
+      if (mm < 10) mm = "0" + mm
       time = `${hh}:${mm}`
-    } else {
-      time = ""
     }
+    else time = ""
+
     return time
   },
 
-  setsel(id) {
-    // set the filter selections when navigating back from another page
-    let x = document.getElementById(id)
-    for (let i = 0; i < x.length; i++) {
-      id == "time" ? x.options[i].text == Movie.filtertime ? x.options[i].selected = true : null : null
-      id == "yeargt" ? x.options[i].text == Movie.filteryeargt ? x.options[i].selected = true : null : null
-      id == "yearlt" ? x.options[i].text == Movie.filteryearlt ? x.options[i].selected = true : null : null
-      id == "type" ? x.options[i].text == Movie.filtertype ? x.options[i].selected = true : null : null
-      id == "genre" ? x.options[i].text == Movie.filtergenre ? x.options[i].selected = true : null : null
-      id == "disk" ? x.options[i].text == Movie.filterdisk ? x.options[i].selected = true : null : null
-      id == "seen" ? x.options[i].text == Movie.filterseen ? x.options[i].selected = true : null : null
-    }
+  oninit: ({state}) => {
+    Model.loadlist()
+    state.zoekterm = s("")
+    state.yesno = false
+    state.reset = false
   },
 
-  oninit(vnode) {
-    Movie.loadlist()
-    this.zoekterm = s("")
-    this.yesno = false
-    this.reset = false
-  },
+  onbeforeupdate: ({state}) => {
+    Model.filterlist = Model.list
 
-  onbeforeupdate(vnode) {
-    Movie.filterlist = Movie.list
-
-    if (this.reset) {
-      Movie.filtertime = "< Time"
-      Movie.filteryeargt = "> Year"
-      Movie.filteryearlt = "< Year"
-      Movie.filtertype = "Type"
-      Movie.filtergenre = "Genre"
-      Movie.filterdisk = "Disk"
-      Movie.filterseen = "Seen"
-      this.reset = false
-
-      let options = document.querySelectorAll('.sel option')
-      for (let i = 0; i < options.length; i++) {
-        options[i].selected = options[i].defaultSelected
-      }
+    if (state.reset) {
+      Model.filtertime = "< Time"
+      Model.filteryeargt = "> Year"
+      Model.filteryearlt = "< Year"
+      Model.filtertype = "Type"
+      Model.filtergenre = "Genre"
+      Model.filterdisk = "Disk"
+      Model.filterseen = "Seen"
+      state.reset = false
     }
 
-    if (Movie.filtertime != "< Time") {
-      let res = Movie.filtertime.split(":")
+    if (Model.filtertime !== "< Time") {
+      const res = Model.filtertime.split(":")
       let min = Number(res[0]) * 60
       min += Number(res[1])
-      Movie.filterlist = Movie.filterlist.filter(item => {
-        return item.runtime < min})
+      Model.filterlist = Model.filterlist.filter(item => item.runtime < min)
     }
 
-    if (Movie.filteryeargt != "> Year") {
-      Movie.filterlist = Movie.filterlist.filter(item => {
-        return item.year > Number(Movie.filteryeargt)})
+    if (Model.filteryeargt !== "> Year") {
+      Model.filterlist = Model.filterlist.filter(item => item.year > Number(Model.filteryeargt))
     }
 
-    if (Movie.filteryearlt != "< Year") {
-      Movie.filterlist = Movie.filterlist.filter(item => {
-        return item.year < Number(Movie.filteryearlt)})
+    if (Model.filteryearlt !== "< Year") {
+      Model.filterlist = Model.filterlist.filter(item => item.year < Number(Model.filteryearlt))
     }
 
-    if (Movie.filtertype != "Type") {
-      Movie.filterlist = Movie.filterlist.filter(item => {
-        return item.type === Movie.filtertype})
+    if (Model.filtertype !== "Type") {
+      Model.filterlist = Model.filterlist.filter(item => item.type === Model.filtertype)
     }
 
-    if (Movie.filtergenre != "Genre") {
-      Movie.filterlist = Movie.filterlist.filter(item => {
-        return item.genres.indexOf(Movie.filtergenre) > -1})
+    if (Model.filtergenre !== "Genre") {
+      Model.filterlist = Model.filterlist.filter(item => item.genres.indexOf(Model.filtergenre) > -1)
     }
 
-    if (Movie.filterdisk != "Disk") {
-      Movie.filterlist = Movie.filterlist.filter(item => {
-        return item.disk == Movie.filterdisk})
+    if (Model.filterdisk !== "Disk") {
+      Model.filterlist = Model.filterlist.filter(item => item.disk == Model.filterdisk)
     }
 
-    if (Movie.filterseen != "Seen") {
-      Movie.filterseen === "Yes" ? this.yesno = true : this.yesno = false
-      Movie.filterlist = Movie.filterlist.filter(item => {
-        return item.seen === this.yesno})
+    if (Model.filterseen !== "Seen") {
+      Model.filterseen === "Yes" ? state.yesno = true : state.yesno = false
+      Model.filterlist = Model.filterlist.filter(item => item.seen === state.yesno)
     }
 
-    Movie.filterlist = Movie.filterlist.filter(item => {
-      return item.title.toLowerCase().indexOf(vnode.state.zoekterm().toLowerCase()) > -1})
+    Model.filterlist = Model.filterlist.filter(item => item.title.toLowerCase().indexOf(state.zoekterm().toLowerCase()) > -1)
   },
 
-  view(vnode) {
-    return !Movie.filterlist ? m('h4', "Loading...") :
+  view: ({state}) => [
+    !Model.filterlist ? m('h4', "Loading...") :
     m('div',
-      m('input#listsearch[type=search][placeholder="Search title"]', {
-        oninput: m.withAttr("value", this.zoekterm)}),
+      m('input#listsearch', {
+        type: 'search',
+        placeholder: "Search title",
+        oninput: m.withAttr("value", state.zoekterm)
+      }),
       m('br'),
       m('b.mlx', "filters: "),
       m('select.sel#time', {
-        oncreate: () => MovieList.setsel("time"),
-        onchange: function() {Movie.filtertime = this.value}},
-        m('option[selected]', "< Time"),
-        m('option', "1:30"),
-        m('option', "1:45"),
-        m('option', "2:00"),
-        m('option', "2:15"),
-        m('option', "2:30"),
-        m('option', "3:00"),
-        m('option', "5:00")
+        onchange: e => Model.filtertime = e.target.value, value: Model.filtertime},
+        Model.times.map(time => m('option', time))
       ),
       m('select.sel#yeargt', {
-        oncreate: () => MovieList.setsel("yeargt"),
-        onchange: function() {Movie.filteryeargt = this.value}},
-        m('option[selected]', "> Year"),
-        m('option', "1920"),
-        m('option', "1930"),
-        m('option', "1940"),
-        m('option', "1950"),
-        m('option', "1960"),
-        m('option', "1970"),
-        m('option', "1980"),
-        m('option', "1990"),
-        m('option', "2000"),
-        m('option', "2010"),
-        m('option', "2015")
+        onchange: e => Model.filteryeargt = e.target.value, value: Model.filteryeargt},
+        Model.yearsgt.map(year => m('option', year))
       ),
       m('select.sel#yearlt', {
-        oncreate: () => MovieList.setsel("yearlt"),
-        onchange: function() {Movie.filteryearlt = this.value}},
-        m('option[selected]', "< Year"),
-        m('option', "1920"),
-        m('option', "1930"),
-        m('option', "1940"),
-        m('option', "1950"),
-        m('option', "1960"),
-        m('option', "1970"),
-        m('option', "1980"),
-        m('option', "1990"),
-        m('option', "2000"),
-        m('option', "2010"),
-        m('option', "2015")
+        onchange: e => Model.filteryearlt = e.target.value, value: Model.filteryearlt},
+        Model.yearslt.map(year => m('option', year))
       ),
       m('select.sel#type', {
-        oncreate: () => MovieList.setsel("type"),
-        onchange: function() {Movie.filtertype = this.value}},
-        m('option[selected]', "Type"),
-        m('option', "movie"),
-        m('option', "series")
+        onchange: e => Model.filtertype = e.target.value, value: Model.filtertype},
+        Model.types.map(type => m('option', type))
       ),
       m('select.sel#genre', {
-        oncreate: () => MovieList.setsel("genre"),
-        onchange: function() {Movie.filtergenre = this.value}},
-        m('option[selected]', "Genre"),
-        Movie.genres.map(item => {
-          return m('option', item)}),
+        onchange: e => Model.filtergenre = e.target.value, value: Model.filtergenre},
+        Model.genres.map(genre => m('option', genre)),
       ),
       m('select.sel#disk', {
-        oncreate: () => MovieList.setsel("disk"),
-        onchange: function() {Movie.filterdisk = this.value}},
-        m('option[selected]', "Disk"),
-        Movie.disks.map(item => {
-          return m('option', item)}),
+        onchange: e => Model.filterdisk = e.target.value, value: Model.filterdisk},
+        Model.disks.map(disk => m('option', disk)),
       ),
       m('select.sel#seen', {
-        oncreate: () => MovieList.setsel("seen"),
-        onchange: function() {Movie.filterseen = this.value}},
-        m('option[selected]', "Seen"),
-        m('option', "Yes"),
-        m('option', "No")
+        onchange: e => Model.filterseen = e.target.value, value: Model.filterseen},
+        Model.seens.map(seen => m('option', seen)),
       ),
-      m('button.mlxx', {onclick: () => this.reset = true}, "Reset"),
+      m('button.mlxx', {onclick: () => state.reset = true}, "Reset"),
       m('table.u-full-width',
         m('thead',
           m('tr',
@@ -194,28 +126,27 @@ const MovieList = {
           )
         ),
         m('tbody',
-          Movie.filterlist.map((movie, i) => {
-            return m('tr',
+          Model.filterlist.map((Model, i) => [
+            m('tr',
               m('td', i+1),
               m('td',
                 m('a', {
-                  href: "/view/" + movie._id,
+                  href: "/view/" + Model._id,
                   oncreate: m.route.link},
-                  movie.title
+                  Model.title
                 )
               ),
-              m('td.right', MovieList.mm2hm(movie.runtime)),
-              m('td', movie.year),
-              m('td', movie.type),
-              m('td', movie.genres),
-              m('td.right', movie.disk),
-              m('td.center', movie.seen ? m('img[src=checkmark-16.png]') : m('img[src=xmark-16.png].xmark'))
+              m('td.right', List.mm2hm(Model.runtime)),
+              m('td', Model.year),
+              m('td', Model.type),
+              m('td', Model.genres),
+              m('td.right', Model.disk),
+              m('td.center', Model.seen ? m('img', {src: 'checkmark-16.png'}) : m('img.xmark', {src: 'xmark-16.png'}))
             )
-          })
+          ])
         )
       )
     )
-  }
+  ]
 }
-
-module.exports = MovieList
+export default List

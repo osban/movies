@@ -2,7 +2,7 @@
 import m from "mithril"
 import s from "mithril/stream"
 
-const Movie = {
+const Model = {
   pointer: null,
   list: [],
   filterlist: [],
@@ -12,38 +12,41 @@ const Movie = {
   filteryearlt: "< Year",
   filtertype: "Type",
   filtergenre: "Genre",
-  genres: ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy",
-    "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western"],
   filterdisk: "Disk",
   filterseen: "Seen",
 
+  times: ["< Time", "1:30", "1:45", "2:00", "2:15", "2:30", "3:00", "5:00"],
+  yearsgt: ["> Year", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2015"],
+  yearslt: ["< Year", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2015"],
+  types: ["Type", "movie", "series"],
+  genres: ["Genre", "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy",
+    "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western"],
+  seens: ["Seen", "Yes", "No"],
+
   maxdisk: 0,
   disks: [],
-  loadlist() {
-    return m.request({
+  loadlist: () => {
+    m.request({
       method: "GET",
       url: "/getall"
     })
     .then(result => {
-      Movie.list = result
+      Model.list = result
       // sort on title
-      let first = Movie.list[0]
-      Movie.list.sort((a, b) => {
+      Model.list.sort((a, b) => {
         return a.title.toLowerCase() > b.title.toLowerCase() ? 1 : a.title.toLowerCase() < b.title.toLowerCase() ? -1 : 0
       })
-      if (first === Movie.list[0]) list.reverse()
       // init filter list
-      Movie.filterlist = Movie.list
+      Model.filterlist = Model.list
       // find the max number of disks
-      Movie.maxdisk = 0
-      Movie.filterlist.map(item => {
-        Number(item.disk) > Movie.maxdisk ? Movie.maxdisk = Number(item.disk) : null
-        return Movie.maxdisk
+      Model.maxdisk = 0
+      Model.filterlist.map(item => {
+        if (Number(item.disk) > Model.maxdisk) Model.maxdisk = Number(item.disk)
+        return Model.maxdisk
       })
       // fill disks array
-      for (let i=0; i < Movie.maxdisk+1; i++) {
-        Movie.disks[i] = i
-      }
+      Model.disks[0] = "Disk"
+      for (let i=0; i < Model.maxdisk+1; i++) Model.disks[i+1] = i
     })
   },
 
@@ -53,54 +56,46 @@ const Movie = {
   year: "",
   error: "",
   state: "",
-  geteps(id) {
-    let url = "http://www.omdbapi.com/?i=" + id
-    return m.request({
+  geteps: id => {
+    m.request({
       method: "GET",
-      url: url
+      url: "http://www.omdbapi.com/?i=" + id
     })
-    .then(result => {
-      Movie.cureps = result
-    })
+    .then(result => Model.cureps = result)
   },
 
   searching: "",
-  getquery(name) {
-    Movie.searching = "Searching..."
-    Movie.error = ""
-    let url = "http://www.omdbapi.com/?s=" + name
+  getquery: name => {
+    Model.searching = "Searching..."
+    Model.error = ""
     return m.request({
       method: "GET",
-      url: url
+      url: "http://www.omdbapi.com/?s=" + name + "&apikey=578e3620"
     })
     .then(result => {
-      Movie.current = result
-      Movie.current.Response === "False" ? (Movie.error = Movie.current.Error, Movie.state = "error") : Movie.state = "found"
-      Movie.searching = ""
-      if (Movie.current.Response === "True") {
-        if (Movie.current.totalResults !== "1") {
-          Movie.state = "list"
-        } else {
-          Movie.getqueryid(Movie.current.Search[0].imdbID)
-        }
+      Model.current = result
+      Model.current.Response === "False" ? (Model.error = Model.current.Error, Model.state = "error") : Model.state = "found"
+      Model.searching = ""
+      if (Model.current.Response === "True") {
+        if (Model.current.totalResults !== "1") Model.state = "list"
+        else Model.getqueryid(Model.current.Search[0].imdbID)
       }
     })
   },
 
   initseasons: true,
-  getqueryid(id) {
-    Movie.searching = "Searching..."
-    Movie.error = ""
-    let url = "http://www.omdbapi.com/?i=" + id
-    return m.request({
+  getqueryid: id => {
+    Model.searching = "Searching..."
+    Model.error = ""
+    m.request({
       method: "GET",
-      url: url
+      url: "http://www.omdbapi.com/?i=" + id + "&apikey=578e3620"
     })
     .then(result => {
-      Movie.current = result
-      Movie.current.Response === "False" ? (Movie.error = Movie.current.Error, Movie.state = "error") : Movie.state = "found"
-      Movie.searching = ""
-      Movie.initseasons = true
+      Model.current = result
+      Model.current.Response === "False" ? (Model.error = Model.current.Error, Model.state = "error") : Model.state = "found"
+      Model.searching = ""
+      Model.initseasons = true
     })
   },
 
@@ -130,67 +125,59 @@ const Movie = {
     seasonsseen: [],
     notes: s("")
   },
-  checkseasonsowned(checked, name) {
-    Movie.postdata.seasonsowned[Number(name) - 1] = checked
-  },
-  checkseasonsseen(checked, name) {
-    Movie.postdata.seasonsseen[Number(name) - 1] = checked
-  },
-  postmovie() {
-    Movie.current.Title ? Movie.postdata.title = Movie.current.Title : Movie.postdata.title = "Untitled"
-    Movie.postdata.year = Movie.current.Year
-    Movie.postdata.poster = Movie.current.Poster
-    Movie.postdata.plot = Movie.current.Plot
-    Movie.postdata.director = Movie.current.Director
-    Movie.postdata.writer = Movie.current.Writer
-    Movie.postdata.cast = Movie.current.Actors
-    Movie.postdata.country = Movie.current.Country
-    Movie.postdata.languages = Movie.current.Language
-    Movie.postdata.runtime = Movie.current.Runtime.replace(/[^0-9]/g, "")
-    Movie.postdata.genres = Movie.current.Genre
-    Movie.postdata.type = Movie.current.Type
-    Movie.postdata.rating = Movie.current.imdbRating
-    Movie.postdata.metascore = Movie.current.Metascore
-    Movie.postdata.imdbid = Movie.current.imdbID
-    Movie.postdata.imdburl = "https://www.imdb.com/title/" + Movie.current.imdbID
-    return m.request({
+
+  checkseasonsowned: (checked, name) => Model.postdata.seasonsowned[Number(name)-1] = checked,
+  checkseasonsseen: (checked, name) => Model.postdata.seasonsseen[Number(name)-1] = checked,
+
+  postmovie: () => {
+    Model.current.Title ? Model.postdata.title = Model.current.Title : Model.postdata.title = "Untitled"
+    Model.postdata.year = Model.current.Year
+    Model.postdata.poster = Model.current.Poster
+    Model.postdata.plot = Model.current.Plot
+    Model.postdata.director = Model.current.Director
+    Model.postdata.writer = Model.current.Writer
+    Model.postdata.cast = Model.current.Actors
+    Model.postdata.country = Model.current.Country
+    Model.postdata.languages = Model.current.Language
+    Model.postdata.runtime = Model.current.Runtime.replace(/[^0-9]/g, "")
+    Model.postdata.genres = Model.current.Genre
+    Model.postdata.type = Model.current.Type
+    Model.postdata.rating = Model.current.imdbRating
+    Model.postdata.metascore = Model.current.Metascore
+    Model.postdata.imdbid = Model.current.imdbID
+    Model.postdata.imdburl = "https://www.imdb.com/title/" + Model.current.imdbID
+    m.request({
       method: "POST",
       url: "/post",
-      data: Movie.postdata
+      data: Model.postdata
     })
     .then(() => {
-      Movie.postdata.seasons = 0
-      Movie.initseasons = true
-      Movie.postdata.originaltitle("")
-      Movie.postdata.notes("")
-      Movie.added = true
-      Movie.state = ""
+      Model.postdata.seasons = 0
+      Model.initseasons = true
+      Model.postdata.originaltitle("")
+      Model.postdata.notes("")
+      Model.added = true
+      Model.state = ""
     })
   },
 
   updated: false,
-  putmovie(id) {
-    let url = "/put/" + id
-    return m.request({
+  putmovie: id => {
+    m.request({
       method: "PUT",
-      url: url,
-      data: Movie.current
+      url: "/put/" + id,
+      data: Model.current
     })
-    .then(() => {
-      Movie.updated = true
-    })
+    .then(() => Model.updated = true)
   },
-  delmovie(id) {
-    let url = "/delete/" + id
-    return m.request({
+
+  delmovie: id => {
+    m.request({
       method: "DELETE",
-      url: url,
-      data: {id: id}
+      url: "/delete/" + id
     })
-    .then(() => {
-      Movie.deleted = true
-    })
+    .then(() => Model.deleted = true)
   }
 }
 
-module.exports = Movie
+export default Model
