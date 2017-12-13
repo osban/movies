@@ -5,27 +5,19 @@ import EditSeries from "./editseries"
 const EditInfo = {
   binds: data => {
     return {onchange: e => {
-      e.target.name === "seen" ? Model.current.seen = !Model.current.seen : data[e.target.name] = e.target.value}}
+      if (e.target.name === "seen") Model.current.seen = !Model.current.seen
+      else data[e.target.name] = e.target.value
+    }}
   },
 
-  delok: () => {
-    document.getElementById('delok').style.display="block"
-    document.getElementById('delokok').onclick = () => {
-      Model.delmovie(Model.current._id)
-      document.getElementById('delok').style.display="none"
-    }
-
-    document.getElementById('delokno').onclick = () => {
-      document.getElementById('delok').style.display="none"
-    }
-  },
+  oninit: ({state}) => {state.showdelok = false},
 
   onupdate: () => {
     Model.deleted = false
     Model.updated = false
   },
 
-  view: () => [
+  view: ({state}) => [
     m('div', EditInfo.binds(Model.current),
       m('div.row.mtxx',
         m('div.seven columns',
@@ -113,9 +105,10 @@ const EditInfo = {
         Model.current.type === "series" && m(EditSeries),
         m('div',
           m('button.button-primary.mrxx', {onclick: () => Model.putmovie(Model.current._id)}, "Update"),
-          m('button.button-primary#btndel', {onclick: () => EditInfo.delok()}, "Delete")
+          m('button.button-primary#btndel', {onclick: () => state.showdelok = true}, "Delete")
         )
       ),
+      state.showdelok &&
       m('div#delok',
         m('span#delok0', `Delete confirmation`),
         m('span#delok1', `Are you sure you want to delete`),
@@ -124,11 +117,16 @@ const EditInfo = {
         m('span#delok2', Model.current.title),
         m('span', " << ?"),
         m('br'),
-        m('button#delokok.mrx', "YES"),
-        m('button#delokno.mlx', "NO")
+        m('button#delokok.mrx', {
+          onclick: () => {
+            state.showdelok = false
+            Model.delmovie(Model.current._id)}
+        }, "YES"),
+        m('button#delokno.mlx', {
+          onclick: () => state.showdelok = false
+        }, "NO")
       )
     )
   ]
 }
-
 export default EditInfo

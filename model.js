@@ -66,9 +66,9 @@ const Model = {
     .then(result => Model.cureps = result)
   },
 
-  searching: "",
+  searching: false,
   getquery: name => {
-    Model.searching = "Searching..."
+    Model.searching = true
     Model.error = ""
     m.request({
       method: "GET",
@@ -77,7 +77,7 @@ const Model = {
     .then(result => {
       Model.current = result
       Model.current.Response === "False" ? (Model.error = Model.current.Error, Model.state = "error") : Model.state = "found"
-      Model.searching = ""
+      Model.searching = false
       if (Model.current.Response === "True") {
         if (Model.current.totalResults !== "1") Model.state = "list"
         else Model.getqueryid(Model.current.Search[0].imdbID)

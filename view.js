@@ -4,12 +4,15 @@ import Model from "./model"
 import ViewInfo from "./viewinfo"
 
 const View = {
-  findModel: zoek => {
-    Model.current = Model.list.find((item, i) => {
+  find: zoek => {
+    const found = Model.list.find((item, i) => {
       if (item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1) Model.pointer = i
         return item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1
     })
-    if (Model.current.seasons > 0) Model.showeps = -1
+    if (found) {
+      Model.current = found
+      if (Model.current.seasons > 0) Model.showeps = -1
+    }
   },
 
   prevnext: porn => {
@@ -53,9 +56,14 @@ const View = {
           m('input.zoek', {
             type: 'text',
             placeholder: "find by name",
-            onfocus: e => e.target.select(),
             oninput: m.withAttr('value', state.zoekterm),
-            onchange: () => {if (state.zoekterm() !== "") ModelView.findModel(state.zoekterm())}
+            onkeypress: e => {
+              if (e.keyCode === 13 && state.zoekterm() !== "") {
+                View.find(state.zoekterm())
+                e.target.blur()
+              }
+            },
+            onchange: () => {if (state.zoekterm() !== "") View.find(state.zoekterm())}
           }),
           Model.pointer > 0
           ? m('button.btnprev', {onclick: () => View.prevnext("prev")}, "PREV")
@@ -70,5 +78,4 @@ const View = {
     )
   ]
 }
-
 export default View

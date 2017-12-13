@@ -4,11 +4,12 @@ import Model from "./model"
 import EditInfo from "./editinfo"
 
 const Edit = {
-  findmovie: zoek => {
-    Model.current = Model.list.find((item, i) => {
+  find: zoek => {
+    const found = Model.list.find((item, i) => {
       if (item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1) Model.pointer = i
       return item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1
     })
+    if (found) Model.current = found
   },
 
   oninit: ({state, attrs}) => {
@@ -24,6 +25,8 @@ const Edit = {
       })
     }
     Model.list[0] && Model.current.year ? Model.year = "(" + Model.current.year + ")" : Model.year = ""
+    Model.updated = false
+    Model.deleted = false
   },
 
   onbeforeupdate: () => {
@@ -37,18 +40,28 @@ const Edit = {
           m('input.zoek', {
             type: 'text',
             placeholder: "find by name",
-            onfocus: e => {e.target.select(); Model.updated = false; Model.deleted = false},
+            onfocus: e => {Model.updated = false; Model.deleted = false},
             oninput: m.withAttr('value', state.zoekterm),
-            onchange: () => {if (state.zoekterm() !== "") MovieEdit.findmovie(state.zoekterm())}
+            onkeypress: e => {
+              if (e.keyCode === 13 && state.zoekterm() !== "") {
+                Edit.find(state.zoekterm())
+                e.target.blur()
+              }
+            },
+            onchange: () => {if (state.zoekterm() !== "") Edit.find(state.zoekterm())}
           }),
           Model.pointer > 0
           ? m('button.btnprev', {
-              onclick: () => {Model.current = Model.list[Model.pointer - 1]; Model.pointer--}
+              onclick: () => {
+                Model.current = Model.list[Model.pointer - 1]
+                Model.pointer--}
             }, "PREV")
           : m('button.btninvisp[disabled]', "PREV"),
           Model.pointer < Model.list.length - 1
           ? m('button.mrxx', {
-              onclick: () => {Model.current = Model.list[Model.pointer + 1]; Model.pointer++}
+              onclick: () => {
+                Model.current = Model.list[Model.pointer + 1]
+                Model.pointer++}
             }, "NEXT")
           : m('button.btninvisn[disabled]', "NEXT"),
           Model.updated && m('b.red', "Movie updated!"),
@@ -59,5 +72,4 @@ const Edit = {
     )
   ]
 }
-
 export default Edit

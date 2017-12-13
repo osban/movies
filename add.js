@@ -9,6 +9,7 @@ const Add = {
     state.zoekterm = s("")
     state.zoektermi = s("")
     Model.state = ""
+    Model.added = false
 
     // If reload, go to list page
     if (!Model.list.length) m.route.set("/")
@@ -21,7 +22,7 @@ const Add = {
           m('input.zoek', {
             type: 'text',
             placeholder: "find",
-            onfocus: e => {e.target.select(); Model.added = false},
+            onfocus: () => Model.added = false,
             oninput: m.withAttr('value', state.zoekterm),
             onkeypress: e => {
               if (e.keyCode === 13 && state.zoekterm() !== "") {
@@ -34,7 +35,7 @@ const Add = {
           m('input.zoeki', {
             type: 'text',
             placeholder: "find by id",
-            onfocus: e => {e.target.select(); Model.added = false},
+            onfocus: () => Model.added = false,
             oninput: m.withAttr('value', state.zoektermi),
             onkeypress: e => {
               if (e.keyCode === 13 && state.zoektermi() !== "") {
@@ -44,7 +45,8 @@ const Add = {
             },
             onchange: () => {if (state.zoektermi() !== "") Model.getqueryid(state.zoektermi())}
           }),
-          Model.added ? m('b.red', "Movie added!") : m('b.green', Model.searching)
+          Model.added && m('b.red', "Movie added!"),
+          Model.searching && m('b.green', "Searching...")
         )
       ),
       Model.state === "error"
@@ -55,5 +57,4 @@ const Add = {
     )
   ]
 }
-
 export default Add

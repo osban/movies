@@ -51,7 +51,7 @@ img {max-width: 300px}
 .red {color: red}
 .green {color: green}
 
-#delok {display: none; position: absolute; top: 50%; left: 50%; width: 400px; height: 200px; margin-left: -200px; margin-top: -100px;
+#delok {display: block; position: absolute; top: 50%; left: 50%; width: 400px; height: 200px; margin-left: -200px; margin-top: -100px;
         border: 3px solid #990000; border-radius: 8px; text-align: center; background-color: #ffffff; }
 #delok0 {display: inline-block; width: 99%; padding: 4px 0 4px 5px; font-size: smaller; text-align: left;
           background-color: #990000; color: #ffffff}

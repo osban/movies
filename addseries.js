@@ -24,31 +24,29 @@ const AddSeries = {
     m('div',
       m('b', "owned:"),
       m('br'),
-      Model.postdata.seasonsowned.map((item, season) => {
-        season++
-        return m('span',
+      Model.postdata.seasonsowned.map((item, i) => [
+        m('span',
           m('input', {
             type: 'checkbox',
-            name: season,
-            onchange: function() {Model.checkseasonsowned(this.checked, this.name)}}
+            name: i+1,
+            onchange: e => Model.checkseasonsowned(e.target.checked, e.target.name)}
           ),
-          m('b.season.labeltop', "Season " + season)
+          m('b.season.labeltop', "Season " + (i+1))
         )
-      }),
+      ]),
       m('br'),
       m('b', "seen:"),
       m('br'),
-      Model.postdata.seasonsseen.map((item, season) => {
-        season++
-        return m('span',
+      Model.postdata.seasonsseen.map((item, i) => [
+        m('span',
           m('input', {
             type: 'checkbox',
-            name: season,
-            onchange: function() {Model.checkseasonsseen(this.checked, this.name)}}
+            name: i+1,
+            onchange: e => Model.checkseasonsseen(e.target.checked, e.target.name)}
           ),
-          m('b.season.labeltop', "Season " + season)
+          m('b.season.labeltop', "Season " + (i+1))
         )
-      })
+      ])
     )
   ]
 }
