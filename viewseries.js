@@ -20,10 +20,13 @@ const ViewSeries = {
             Model.current.seasonsowned.map((season, i) => [
               m('tr',
                 m('td',
-                  m('a', {onclick: () => Model.showeps = i}, "Season " + (i+1))
+                  m('a', {
+                    style: "cursor: pointer",
+                    onclick: () => Model.showeps = i
+                  }, "Season " + (i+1))
                 ),
                 m('td',
-                  m('span', season 
+                  m('span', season
                     ? m('img', {src: 'images/checkmark-16.png'})
                     : m('img.xmark', {src: 'images/xmark-16.png'}))
                 ),
