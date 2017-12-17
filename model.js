@@ -54,7 +54,7 @@ const Model = {
 
   current: null,
   cureps: null,
-  showeps: -1,
+  showeps: false,
   year: "",
   error: "",
   state: "",
@@ -63,7 +63,10 @@ const Model = {
       method: "GET",
       url: "http://www.omdbapi.com/?i=" + id + "&apikey=" + Model.omdbapi
     })
-    .then(result => Model.cureps = result)
+    .then(result => {
+      Model.cureps = result
+      Model.showeps = true
+    })
   },
 
   searching: false,

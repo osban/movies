@@ -2,12 +2,11 @@ import m from "mithril"
 import Model from "./model"
 
 const ViewSeries = {
-  onbeforeupdate: () => {
-    if (Model.showeps > -1)
-      Model.geteps(Model.current.imdbid + "&Season=" + Number(Model.showeps + 1))
-  },
+  oninit: ({state}) => {state.season = 0},
 
-  view: () => [
+  onbeforeremove: () => {Model.showeps = false},
+
+  view: ({state}) => [
     m('div',
       m('div.three columns',
         m('table',
@@ -22,7 +21,9 @@ const ViewSeries = {
                 m('td',
                   m('a', {
                     style: "cursor: pointer",
-                    onclick: () => Model.showeps = i
+                    onclick: () => {
+                      state.season = i+1
+                      Model.geteps(Model.current.imdbid + "&Season=" + (i+1))}
                   }, "Season " + (i+1))
                 ),
                 m('td',
@@ -40,14 +41,15 @@ const ViewSeries = {
           )
         )
       ),
+      Model.showeps &&
       m('div.five columns',
         m('table',
           m('thead',
             m('th'),
-            Model.showeps > -1 && m('th', "Season " + (Model.showeps + 1))
+            m('th', "Season " + state.season)
           ),
           m('tbody',
-            Model.showeps > -1 && Model.cureps.Episodes.map(item => [
+            Model.cureps.Episodes.map(item => [
               m('tr',
                 m('td', item.Episode + "."),
                 m('td',

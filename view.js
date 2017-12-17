@@ -9,10 +9,7 @@ const View = {
       if (item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1) Model.pointer = i
         return item.title.toLowerCase().indexOf(zoek.toLowerCase()) > -1
     })
-    if (found) {
-      Model.current = found
-      if (Model.current.seasons > 0) Model.showeps = -1
-    }
+    if (found) Model.current = found
   },
 
   prevnext: porn => {
@@ -24,7 +21,7 @@ const View = {
       Model.current = Model.list[Model.pointer + 1]
       Model.pointer++
     }
-    if (Model.current.seasons > 0) Model.showeps = -1
+    Model.showeps = false
   },
 
   oninit: ({state, attrs}) => {
@@ -41,7 +38,7 @@ const View = {
         return item._id === attrs.id
       })
     }
-    if (Model.list.length && Model.current.seasons > 0) Model.showeps = -1
+    Model.showeps = false
     Model.list[0] && Model.current.year ? Model.year = "(" + Model.current.year + ")" : Model.year = ""
   },
 
