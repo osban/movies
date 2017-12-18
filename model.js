@@ -15,6 +15,7 @@ const Model = {
   filtergenre: "Genre",
   filterdisk: "Disk",
   filterseen: "Seen",
+  sort: "alphabetic",
 
   times: ["< Time", "1:30", "1:45", "2:00", "2:15", "2:30", "3:00", "5:00"],
   yearsgt: ["> Year", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2015"],
@@ -23,6 +24,7 @@ const Model = {
   genres: ["Genre", "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy",
     "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western"],
   seens: ["Seen", "Yes", "No"],
+  sorts: ["alphabetic", "id ascending", "id descending"],
 
   maxdisk: 0,
   disks: [],

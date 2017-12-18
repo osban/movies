@@ -22,10 +22,26 @@ const List = {
     state.zoekterm = s("")
     state.yesno = false
     state.reset = false
+    state.sort = "alphabetic"
   },
 
   onbeforeupdate: ({state}) => {
     Model.filterlist = Model.list
+    
+    if (state.sort !== Model.sort) {
+      const sorts = {
+        'alphabetic': () => {Model.filterlist = Model.list.sort((a,b) =>
+          a.title.toLowerCase() > b.title.toLowerCase() ? 1 : a.title.toLowerCase() < b.title.toLowerCase() ? -1 : 0)
+        },
+        'id ascending': () => {
+          Model.filterlist = Model.list.sort((a,b) => a._id > b._id ? 1 : a._id < b._id ? -1 : 0)
+        },
+        'id descending': () => {
+          Model.filterlist = Model.list.sort((a,b) => a._id < b._id ? 1 : a._id > b._id ? -1 : 0)
+        }
+      }[state.sort]()
+      Model.sort = state.sort
+    }
 
     if (state.reset) {
       Model.filtertime = "< Time"
@@ -81,6 +97,10 @@ const List = {
         placeholder: "Search title",
         oninput: m.withAttr("value", state.zoekterm)
       }),
+      m('b', "Sort: "),
+      m('select', {onchange: e => state.sort = e.target.value, value: state.sort},
+        Model.sorts.map(sort => m('option', sort))
+      ),
       m('br'),
       m('b.mlx', "filters: "),
       m('select.sel#time', {
