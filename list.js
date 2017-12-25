@@ -19,7 +19,6 @@ const List = {
 
   oninit: ({state}) => {
     Model.loadlist()
-    state.zoekterm = s("")
     state.yesno = false
     state.reset = false
     state.sort = "alphabetic"
@@ -27,7 +26,7 @@ const List = {
 
   onbeforeupdate: ({state}) => {
     Model.filterlist = Model.list
-    
+
     if (state.sort !== Model.sort) {
       const sorts = {
         'alphabetic': () => {Model.filterlist = Model.list.sort((a,b) =>
@@ -86,7 +85,7 @@ const List = {
       Model.filterlist = Model.filterlist.filter(item => item.seen === state.yesno)
     }
 
-    Model.filterlist = Model.filterlist.filter(item => item.title.toLowerCase().indexOf(state.zoekterm().toLowerCase()) > -1)
+    Model.filterlist = Model.filterlist.filter(item => item.title.toLowerCase().indexOf(Model.zoekterm().toLowerCase()) > -1)
   },
 
   view: ({state}) => [
@@ -95,8 +94,10 @@ const List = {
       m('input#listsearch', {
         type: 'search',
         placeholder: "Search title",
-        oninput: m.withAttr("value", state.zoekterm)
+        oninput: m.withAttr("value", Model.zoekterm),
+        value: Model.zoekterm()
       }),
+      m('button.mrxxx', {onclick: () => Model.zoekterm("")}, "Clear"),
       m('b', "Sort: "),
       m('select', {onchange: e => state.sort = e.target.value, value: state.sort},
         Model.sorts.map(sort => m('option', sort))

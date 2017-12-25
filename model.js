@@ -26,6 +26,7 @@ const Model = {
   seens: ["Seen", "Yes", "No"],
   sorts: ["alphabetic", "id ascending", "id descending"],
 
+  zoekterm: s(""),
   maxdisk: 0,
   disks: [],
   loadlist: () => {
@@ -186,5 +187,4 @@ const Model = {
     .then(() => Model.deleted = true)
   }
 }
-
 export default Model
