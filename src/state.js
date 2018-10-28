@@ -24,7 +24,6 @@ const State = () => ({
   },
   search: '',
   checks: {},
-  achecks: {},
 
   // info
   eps: [],

@@ -36,8 +36,8 @@ const postprep = qone => {
 }
 
 const update = (movie, res) => new Promise((resolve, reject) => {
-  if (movie.rating !== res.imdbRating || movie.metascore !== res.Metascore ||
-      movie.poster !== res.Poster || (movie.type === 'series' && Number(res.totalSeasons) > movie.seasonsowned.length)) {
+  if (movie.rating !== res.imdbRating || movie.metascore !== res.Metascore || movie.poster !== res.Poster ||
+      (movie.type === 'series' && Number(res.totalSeasons) > movie.seasonsowned.length)) {
     movie.rating    = res.imdbRating
     movie.metascore = res.Metascore
     movie.poster    = res.Poster
@@ -166,7 +166,7 @@ const Actions = state => ({
 
   selmovie: id => {
     const index = state.list.findIndex(x => x._id === id)
-    // update data
+    // update data if needed
     m.request({url: omdbapi('i', state.list[index].imdbid, state.omdb)})
     .then(res => {
       update(state.list[index], res)

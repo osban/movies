@@ -16,7 +16,7 @@ const List = (state, actions) =>
       ),
       m('span',
         m('a.material-icons' +b.m(0,24,0,12).va(-7).c('#616161').pointer.$hover(b.c('#349cfb')), {
-          onclick: () => {state.page = 'add'}
+          onclick: () => state.page = 'add'
         }, 'add'),
         m('span' +b.va(-8).transition('opacity 0.2s ease-in'), {
             style: Object.keys(state.checks).some(x => state.checks[x] === true)

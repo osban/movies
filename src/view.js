@@ -7,7 +7,6 @@ import Snackbar from './snackbar'
 const View = (state, actions) => ({
   oninit: () => {
     actions.get()
-    // .then(() => actions.correct())
     actions.selclear()
   },
 

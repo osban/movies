@@ -1,5 +1,3 @@
-// import Checkbox from './checkbox'
-
 const Addlist = (state, actions) =>
   m('div' +b.p(0,36).overflowY('auto').h('calc(100vh - 242px)'),
     m('h4', `Found: ${state.qres.totalResults}`,
