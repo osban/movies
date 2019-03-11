@@ -2,7 +2,7 @@ import Checkbox from './checkbox'
 import Adds     from './adds'
 
 const Addone = (state, actions) =>
-  m('div' +b.overflowY('auto').h('calc(100vh - 242px)'),
+  m('div' +b.ofy('auto').h('calc(100vh - 242px)'),
     m('div' +b.bsi.p(0,36),
       m('div' +b.dg.gtc('50%','50%').gtr('auto').gta(`'left right'`),
         m('div' +b.ga('left'),
@@ -25,7 +25,7 @@ const Addone = (state, actions) =>
             m('div', {class: x === 'Genre' ? b.mb(12).class : null},
               m('b' +b.mr(6), `${x.toLowerCase()}: `),
               x === 'Runtime'
-              ? m('span', actions.mm2hm(state.qone.Runtime.split(' ')[0]))
+              ? m('span', actions.mm2hm(state.qone.Runtime.split(' ')[0] || 0))
               : m('span', state.qone[x])
             )
           ),

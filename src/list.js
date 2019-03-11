@@ -18,7 +18,7 @@ const List = (state, actions) =>
         m('a.material-icons' +b.m(0,24,0,12).va(-7).c('#616161').pointer.$hover(b.c('#349cfb')), {
           onclick: () => state.page = 'add'
         }, 'add'),
-        m('span' +b.va(-8).transition('opacity 0.2s ease-in'), {
+        m('span' +b.va(-8).tra('opacity 0.2s ease-in'), {
             style: Object.keys(state.checks).some(x => state.checks[x] === true)
               ? b.o(1).default.style
               : b.o(0).default.style
@@ -37,23 +37,23 @@ const List = (state, actions) =>
           }, 'delete')
         )
       ),
-      Object.keys(state.filters).map(x =>
-        m('select' +b.p(4,8), {
-            onchange: e => {
-              actions.setfilter(x, e.target.value)
-              e.target.blur()
-            }
-          },
-          state.filters[x].map(y =>
-            y === state.filter[x]
-            ? m('option[selected]' +b.p(4,0), y)
-            : m('option' +b.p(4,0), y)
+      m('span' +b.nowrap,
+        Object.keys(state.filters).map(x =>
+          m('select' +b.p(4,8), {
+              onchange: e => {
+                actions.setfilter(x, e.target.value)
+                e.target.blur()
+              }
+            },
+            state.filters[x].map(y =>
+              m('option' +b.p(4,0), {selected: y === state.filter[x]}, y)
+            )
           )
-        )
+        ),
+        m('a.material-icons' +b.m(0,24).va(-7).c('#616161').pointer.$hover(b.c('#349cfb')), {
+          onclick: () => actions.selclear()
+        }, 'cancel')
       ),
-      m('a.material-icons' +b.m(0,24).va(-7).c('#616161').pointer.$hover(b.c('#349cfb')), {
-        onclick: () => actions.selclear()
-      }, 'cancel'),
       m('span' +b.f('right').mt(8),
         ['alphabetic','id ascending','id descending'].map(x =>
           m('span.material-icons' +b.mr(16).c(state.sort === x ? '#349cfb' : null)
@@ -64,8 +64,8 @@ const List = (state, actions) =>
       )
     ),
     m('div' +b.dg.gtc('auto').gtr('auto').gta(`'table'`).bt('1px solid #d2d2d2'),
-      m('div' +b.ga('table').h('calc(100vh - 193px)').overflow('auto'),
-        m('table' +b.w('100%').overflowY('auto').coll,
+      m('div' +b.ga('table').h('calc(100vh - 193px)').of('auto'),
+        m('table' +b.w('100%').ofy('auto').coll,
           m('thead' +b.w('100%').rel.zi(10)
             .$nest('th', b.p(8,16).bc('#f5f5f5').position('sticky').t(0).pr('1em').bs('0px 1px 0px 0px #d2d2d2')),
             m('tr',
@@ -102,7 +102,7 @@ const List = (state, actions) =>
                 : (a._id < b._id ? 1 : a._id > b._id ? -1 : 0)
             )
             .map((x,i) =>
-              m('tr' +b.$hover(b.bc('#efefef').pointer),
+              m('tr' +b.whiteSpace('nowrap').$hover(b.bc('#efefef').pointer),
                 m('td',
                   Checkbox(state.checks[x._id], () => actions.checkit(x._id))
                 ),

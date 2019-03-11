@@ -8,18 +8,18 @@ const Movie = (state, actions) =>
     m('div' +b.h(36).pl(36).mb(36).bb('1px solid #d2d2d2'),
       m('span',
         m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-          onclick: () => {state.page = 'list'}
+          onclick: () => state.page = 'list'
         }, 'home')
       ),
       state.page === 'info'
       ? m('span',
           m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-            onclick: () => {state.page = 'edit'}
+            onclick: () => state.page = 'edit'
           }, 'edit')
         )
       : m('span',
           m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-            onclick: () => {state.page = 'info'}
+            onclick: () => state.page = 'info'
           }, 'visibility')
         ),
       m('span',
@@ -36,7 +36,7 @@ const Movie = (state, actions) =>
       state.page === 'info'
       ? m('span',
           m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-            onclick: () => {state.page = 'add'}
+            onclick: () => state.page = 'add'
           }, 'add')
         )
       : m('span',
@@ -47,7 +47,7 @@ const Movie = (state, actions) =>
         )
     ),
     m('div' +b.dg.gtc('67%','33%').gtr('auto').gta(`'info poster'`)
-      .overflowY('auto').h('calc(100vh - 217px)'),
+      .ofy('auto').h('calc(100vh - 217px)'),
       m('div' +b.ga('info').bsi.p(0,36),
         state.page === 'info' && Info(state, actions),
         state.page === 'edit' && Edit(state),

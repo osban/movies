@@ -1,11 +1,12 @@
 const clone = item => JSON.parse(JSON.stringify(item))
 const omdbapi = (t, q, omdb) => 'http://private.omdbapi.com/?' + t + '=' + q + '&apikey=' + omdb
-const isprev = p => (((Number(p) - 1) * 10) + 1) !== 1 ? true : false
-const isnext = (p, tot) => (Number(p) * 10 >= tot || Number(p) * 10 > 1000) ? false : true
+const isprev = p => (((Number(p) - 1) * 10) + 1) !== 1
+const isnext = (p, tot) => !(Number(p) * 10 >= tot || Number(p) * 10 > 1000)
 
 const filtdisk = state => {
   const disks = [...new Set(state.list.map(x => x.disk))].sort((a,b) => a-b)
   state.filters.disk = [...['Disk'], ...disks]
+  // if the last movie on a disk has been deleted
   if (!state.filters.disk.includes(state.filter.disk)) state.filter.disk = 'Disk'
 }
 
@@ -20,10 +21,10 @@ const postprep = qone => {
   .filter(x => props.includes(x))
   .forEach(x => {
     const actions = {
-      Actors:     () => {obj['cast']      = qone[x]},
-      Runtime:    () => {obj['runtime']   = qone[x] !== 'N/A' ? qone[x].split(' ')[0] : ''},
-      imdbID:     () => {obj['imdbid']    = qone[x]},
-      imdbRating: () => {obj['rating']    = qone[x]}
+      Actors:     () => {obj['cast']    = qone[x]},
+      Runtime:    () => {obj['runtime'] = qone[x] !== 'N/A' ? qone[x].split(' ')[0] : ''},
+      imdbID:     () => {obj['imdbid']  = qone[x]},
+      imdbRating: () => {obj['rating']  = qone[x]}
     }
     if (actions.hasOwnProperty(x)) actions[x]()
     else obj[x.toLowerCase()] = qone[x]
@@ -41,7 +42,7 @@ const update = (movie, res) => new Promise((resolve, reject) => {
     movie.rating    = res.imdbRating
     movie.metascore = res.Metascore
     movie.poster    = res.Poster
-    if (Number(res.totalSeasons) > movie.seasonsowned.length) {
+    if (movie.type === 'series' && Number(res.totalSeasons) > movie.seasonsowned.length) {
       for (let i=0; i < Number(res.totalSeasons) - movie.seasonsowned.length + 1; i++) {
         movie.seasonsowned.push(false)
         movie.seasonsseen.push(false)
@@ -52,7 +53,7 @@ const update = (movie, res) => new Promise((resolve, reject) => {
       url: '/put/' + movie._id,
       data: movie
     })
-    .then(() => resolve())
+    .then(resolve)
     .catch(reject)
   }
   else resolve()
@@ -69,7 +70,7 @@ const error = (state, err) => {
 
 const Actions = state => ({
   get: () =>
-    m.request({url: '/get'})
+    m.request('/get')
     .then(res => {
       state.list = res.list
       state.omdb = res.omdb
@@ -88,7 +89,6 @@ const Actions = state => ({
     })
     .then(res => {
       state.list.push(res)
-      state.qone = {}
       // re-init disk filter
       filtdisk(state)
       state.snackbar = {
@@ -134,7 +134,7 @@ const Actions = state => ({
 
     Promise.all(
       Object.keys(state.checks)
-      .filter(x => state.checks[x] === true)
+      .filter(x => state.checks[x])
       .map(x => {
         const movie = state.list.find(y => y._id === x)
         delone(x, movie.title)
@@ -180,9 +180,10 @@ const Actions = state => ({
   },
 
   setfilter: (which, value) => {
-    state.filter[which] = value === 'Yes' ? true
-      : value === 'No' ? false
-      : value
+    state.filter[which] = 
+      value === 'Yes' ? true :
+      value === 'No'  ? false :
+      value
   },
   selclear: () => Object.keys(state.filters).forEach(x => state.filter[x] = state.filters[x][0]),
 
@@ -197,9 +198,7 @@ const Actions = state => ({
       })
       .then(() => {
         state.checks[id] = false
-        state.snackbar = {
-          text: 'Movie(s)/series updated.'
-        }
+        state.snackbar = {text: 'Movie(s)/series updated.'}
       })
       .catch(err => error(state, err.message))
     }
@@ -227,12 +226,13 @@ const Actions = state => ({
       else {
         if (state.qres.totalResults !== '1') {
           state.qpage = 1
-          state.show = 'list'
+          state.show  = 'list'
         }
         else {
           m.request({url: omdbapi('i', state.qres.Search[0].imdbID, state.omdb)})
-          .then(result => {
-            state.qone = result
+          .then(res => {
+            state.qone = res
+            state.qone.seen = false
             state.show = 'one'
           })
         }

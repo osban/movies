@@ -19,7 +19,7 @@ const Edit = state =>
     m('div' +b.mb(20),
       m('label' +b.dib.w(120).fw('bold').va('top').mt(8), 'notes'),
       m('textarea' +b.dib.bsi.size(460,64).p(8,8,8,14).ff('Open Sans').fs(14).c('#616161')
-        .resize('none').overflowY('auto'), {
+        .resize('none').ofy('auto'), {
         oninput: e => state.movie.notes = e.target.value,
         value: state.movie.notes
       })

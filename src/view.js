@@ -11,7 +11,7 @@ const View = (state, actions) => ({
   },
 
   view: () =>
-    m('div' +b.size('100vw','100vh').center.m(0,'auto').bc('#2f5dab').overflow('hidden'),
+    m('div' +b.size('100vw','100vh').center.m(0,'auto').bc('#2f5dab').of('hidden'),
       m('div' +b.size('80%','calc(100vh - 32px)').m('auto').bc('#fff').pos(0).r(0).b(0).tac.rel,
         m('img', {src: 'images/movies.png'}),
           state.page === 'list' ? list(state, actions)

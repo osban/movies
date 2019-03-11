@@ -1,18 +1,20 @@
 const Addlist = (state, actions) =>
-  m('div' +b.p(0,36).overflowY('auto').h('calc(100vh - 242px)'),
+  m('div' +b.p(0,36).ofy('auto').h('calc(100vh - 242px)'),
     m('h4', `Found: ${state.qres.totalResults}`,
       m('span' +b.ml((((Number(state.qpage) - 1) * 10) + 1) < 10 ? 108 : 100),
         (((Number(state.qpage) - 1) * 10) + 1) + ' - '
         + (Number(state.qpage) * 10 > state.qres.totalResults ? state.qres.totalResults : Number(state.qpage) * 10)
       ),
       m('span' +b.ml(100),
-        m('span.material-icons' +b.mr(20).va(-7).o(actions.isporn('prev') ? 1 : 0)
+        m('span.material-icons' +b.mr(20).va(-7).us('none')
+          .visibility(actions.isporn('prev') ? 'visible' : 'hidden')
           .$hover(b.c('#349cfb').pointer), {
           onclick: () => {
             if (actions.isporn('prev')) actions.querypage('prev')
           }
         }, 'keyboard_arrow_left'),
-        m('span.material-icons' +b.va(-7).o(actions.isporn('next') ? 1 : 0)
+        m('span.material-icons' +b.va(-7).us('none')
+          .visibility(actions.isporn('next') ? 'visible' : 'hidden')
           .$hover(b.c('#349cfb').pointer), {
           onclick: () => {
             if (actions.isporn('next')) actions.querypage('next')

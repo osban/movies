@@ -6,7 +6,7 @@ const Add = (state, actions) =>
     m('div' +b.h(36).pl(36).mb(24).bb('1px solid #d2d2d2'),
       m('span',
         m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-          onclick: () => {state.page = 'list'}
+          onclick: () => state.page = 'list'
         }, 'home')
       )
     ),

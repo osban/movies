@@ -1,21 +1,19 @@
 b.helper({
-  bo: x => b.border(x), //bo = backgroundOrigin
-  bl: x => b.borderLeft(x),
-  br: x => b.borderRight(x), //use br, and bor for borderRadius
-  bt: x => b.borderTop(x),
-  bb: x => b.borderBottom(x),
+  bo : x => b.border(x), //bo = backgroundOrigin
+  bl : x => b.borderLeft(x),
+  br : x => b.borderRight(x), //use br, and bor for borderRadius
+  bt : x => b.borderTop(x),
+  bb : x => b.borderBottom(x),
   boc: x => b.borderColor(x),
   bor: x => b.borderRadius(x),
-  boh: x => b.borderTop(x).borderBottom(x),
-  bov: x => b.borderLeft(x).borderRight(x),
+
+  bsi : b.boxSizing('border-box'),
   coll: b.borderCollapse('collapse'),
 
-  db: b.d('block'),
-  dg: b.d('grid'),
-  di: b.d('inline'), //default
-  dn: b.d('none'),
-  ds: b.d('subgrid'),
-  dt: b.d('table'),
+  db : b.d('block'),
+  dg : b.d('grid'),
+  dn : b.d('none'),
+  dt : b.d('table'),
   dib: b.d('inline-block'),
 
   tac: b.ta('center'),
@@ -27,16 +25,16 @@ b.helper({
   fix: b.position('fixed'),
 
   fw: x => b.fontWeight(x),
-  of: x => b.overflow(x),
 
-  bsi: b.boxSizing('border-box'),
-  cur: x => b.cursor(x),
+  of : x => b.overflow(x),
+  ofx: x => b.overflowX(x),
+  ofy: x => b.overflowY(x),
+
   lis: x => b.listStyle(x), //ls = letterSpacing
   mah: x => b.maxHeight(x), //mh
   mih: x => b.minHeight(x),
   maw: x => b.maxWidth(x),
   miw: x => b.minWidth(x),
-  tes: x => b.textShadow(x), // ts = tabsize => tes
   tra: x => b.transition(x),
 
   pos:  (l,t) => b.l(l).t(t || t === 0 ? t : l),
@@ -47,6 +45,7 @@ b.helper({
   text:    b.cursor('text'),
 
   center: b.d('flex').jc('center').ai('center'),
+  nowrap: b.whiteSpace('nowrap')
 })
 
 b.css({

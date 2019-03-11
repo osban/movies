@@ -2,7 +2,7 @@ const Content = {
   // error
   error: (state, attrs) =>
     m('div' +b.m('auto').bsi.size(600,300).bc('#fff').p(20,16,16,16).rel
-      .bs('0px 2px 5px 0px rgba(0,0,0,.4)').tal.overflowY('auto'),
+      .bs('0px 2px 5px 0px rgba(0,0,0,.4)').tal.ofy('auto'),
       m('div' +b.fs(18).fw(500).pb(13).c('#3c3c3c'), attrs.header || 'Error'),
       m('div' +b.fs(14), m.trust(attrs.text)),
       m('div' +b.abs.b(16).r(24),
