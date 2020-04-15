@@ -1,10 +1,9 @@
-import resolve      from 'rollup-plugin-node-resolve'
-import commonjs     from 'rollup-plugin-commonjs'
-import filesize     from 'rollup-plugin-filesize'
-import progress     from 'rollup-plugin-progress'
-import includepaths from 'rollup-plugin-includepaths'
-import uglify       from 'rollup-plugin-uglify'
-import inject       from 'rollup-plugin-inject'
+import inject   from '@rollup/plugin-inject'
+import resolve  from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import filesize from 'rollup-plugin-filesize'
+import progress from 'rollup-plugin-progress'
+import uglify   from 'rollup-plugin-uglify'
 
 const prod = true
 
@@ -24,10 +23,6 @@ export default {
       }
     }),
     progress(),
-    includepaths({
-      paths: ['./src'],
-      extensions: ['.js']
-    }),
     resolve(), // tells Rollup how to find node_modules
     commonjs(), // converts to ES modules
     filesize(),
