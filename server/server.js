@@ -35,25 +35,25 @@ app.get('/', (req, res) => {
   res.sendFile('index.html')
 })
 
-app.get('/get', (req, res, next) => {
+app.get('/all', (req, res, next) => {
   movies.find()
   .then(list => res.json({list, omdb: process.env.OMDB}))
   .catch(next)
 })
 
-app.post('/post', (req, res, next) => {
+app.post('/', (req, res, next) => {
   movies.insertOne(req.body)
   .then(x => res.json(x), logit(`POST --> ${req.body.title}`))
   .catch(next)
 })
 
-app.put('/put/:id', (req, res, next) => {
-  movies.updateOne(req.params.id, req.body)
+app.put('/:id', (req, res, next) => {
+  movies.updateOne(req.params.id, {$set: req.body})
   .then(x => res.json(x), logit(`PUT --> ${req.body.title}`))
   .catch(next)
 })
 
-app.delete('/del/:id/:title', (req, res, next) => {
+app.delete('/:id/:title', (req, res, next) => {
   movies.deleteOne(req.params.id)
   .then(() => res.json(true), logit(`DELETE --> ${req.params.title}`))
   .catch(next)

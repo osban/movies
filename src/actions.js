@@ -36,7 +36,7 @@ const postprep = qone => {
   return obj
 }
 
-const update = (movie, res) => new Promise((resolve, reject) => {
+const update = (movie, res) => new Promise((rs,rj) => {
   if (movie.rating !== res.imdbRating || movie.metascore !== res.Metascore || movie.poster !== res.Poster ||
       (movie.type === 'series' && Number(res.totalSeasons) > movie.seasonsowned.length)) {
     movie.rating    = res.imdbRating
@@ -48,29 +48,30 @@ const update = (movie, res) => new Promise((resolve, reject) => {
         movie.seasonsseen.push(false)
       }
     }
+
     m.request({
       method: 'PUT',
-      url: '/put/' + movie._id,
-      data: movie
+      url: '/' + movie._id,
+      body: movie
     })
-    .then(resolve)
-    .catch(reject)
+    .then(rs)
+    .catch(rj)
   }
-  else resolve()
+  else rs()
 })
 
 const error = (state, err) => {
   state.modal = {
     type: 'error',
     content: {
-      text: err
+      text: `(${err.code}) ${err.response.error.message}`
     }
   }
 }
 
 const Actions = state => ({
   get: () =>
-    m.request('/get')
+    m.request('/all')
     .then(res => {
       state.list = res.list
       state.omdb = res.omdb
@@ -80,12 +81,12 @@ const Actions = state => ({
       state.list.forEach(x => state.checks[x._id] = false)
       state.checks['all'] = false
     })
-    .catch(err => error(state, err.message)),
+    .catch(err => error(state, err)),
   post: () =>
     m.request({
       method: 'POST',
-      url: '/post',
-      data: postprep(state.qone)
+      url: '/',
+      body: postprep(state.qone)
     })
     .then(res => {
       state.list.push(res)
@@ -101,12 +102,12 @@ const Actions = state => ({
         }
       }
     })
-    .catch(err => error(state, err.message)),
+    .catch(err => error(state, err)),
   put: () =>
     m.request({
       method: 'PUT',
-      url: '/put/' + state.movie._id,
-      data: state.movie
+      url: '/' + state.movie._id,
+      body: state.movie
     })
     .then(() => {
       const index = state.list.findIndex(x => x._id === state.movie._id)
@@ -115,14 +116,14 @@ const Actions = state => ({
       filtdisk(state)
       state.snackbar = {text: 'Movie(s)/series updated.'}
     })
-    .catch(err => error(state, err.message)),
+    .catch(err => error(state, err)),
   del: solo => {
     if (solo) state.checks[state.movie._id] = true
 
     const delone = (id, title) =>
       m.request({
         method: 'DELETE',
-        url: '/del/' + id + '/' + title
+        url: '/' + id + '/' + title
       })
       .then(() => {
         state.list = state.list.filter(x => x._id !== id)
@@ -130,7 +131,7 @@ const Actions = state => ({
         // re-init disk filter
         filtdisk(state)
       })
-      .catch(err => error(state, err.message))
+      .catch(err => error(state, err))
 
     Promise.all(
       Object.keys(state.checks)
@@ -175,7 +176,7 @@ const Actions = state => ({
         state.page = 'info'
         state.season = 0
       })
-      .catch(err => error(state, err.message))
+      .catch(err => error(state, err))
     })
   },
 
@@ -193,14 +194,14 @@ const Actions = state => ({
 
       return m.request({
         method: 'PUT',
-        url: '/put/' + id,
-        data: state.list[state.list.findIndex(x => x._id === id)]
+        url: '/' + id,
+        body: state.list[state.list.findIndex(x => x._id === id)]
       })
       .then(() => {
         state.checks[id] = false
         state.snackbar = {text: 'Movie(s)/series updated.'}
       })
-      .catch(err => error(state, err.message))
+      .catch(err => error(state, err))
     }
 
     Promise.all(
@@ -216,7 +217,7 @@ const Actions = state => ({
       state.eps = result
       state.season = nr
     })
-    .catch(err => error(state, err.message)),
+    .catch(err => error(state, err)),
 
   query: () =>
     m.request({url: omdbapi('s', state.find, state.omdb)})
@@ -238,7 +239,7 @@ const Actions = state => ({
         }
       }
     })
-    .catch(err => error(state, err.message)),
+    .catch(err => error(state, err)),
 
   queryid: id =>
     m.request({url: omdbapi('i', id, state.omdb)})
@@ -250,7 +251,7 @@ const Actions = state => ({
         state.qone.seasonsseen  = [...new Array(Number(state.qone.totalSeasons)).fill(false)]
       }
     })
-    .catch(err => error(state, err.message)),
+    .catch(err => error(state, err)),
 
   isporn: porn => porn === 'prev'
     ? isprev(state.qpage)
@@ -260,7 +261,7 @@ const Actions = state => ({
     const page = '&page=' + (porn === 'next' ? ++state.qpage : --state.qpage)
     return m.request({url: omdbapi('s', state.find + page, state.omdb)})
     .then(result => {state.qres = result})
-    .catch(err => error(state, err.message))
+    .catch(err => error(state, err))
   }
 })
 

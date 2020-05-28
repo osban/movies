@@ -3,9 +3,7 @@ import resolve  from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import filesize from 'rollup-plugin-filesize'
 import progress from 'rollup-plugin-progress'
-import uglify   from 'rollup-plugin-uglify'
-
-const prod = true
+import {terser} from 'rollup-plugin-terser'
 
 export default {
   input: 'src/index.js',
@@ -26,13 +24,6 @@ export default {
     resolve(), // tells Rollup how to find node_modules
     commonjs(), // converts to ES modules
     filesize(),
-    prod && uglify({
-      compress: {
-        pure_getters: true,
-        unsafe: true,
-        unsafe_comps: true,
-        warnings: false,
-      },
-    })
+    terser()
   ]
 }
