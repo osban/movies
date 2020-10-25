@@ -3,6 +3,7 @@ import resolve  from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import filesize from 'rollup-plugin-filesize'
 import progress from 'rollup-plugin-progress'
+import {terser} from 'rollup-plugin-terser'
 
 export default {
   input: 'src/index.js',
@@ -22,6 +23,7 @@ export default {
     progress(),
     resolve(), // tells Rollup how to find node_modules
     commonjs(), // converts to ES modules
-    filesize()
+    filesize(),
+    terser()
   ]
 }

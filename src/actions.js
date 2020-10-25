@@ -1,17 +1,19 @@
-const clone = item => JSON.parse(JSON.stringify(item))
-const omdbapi = (t, q, omdb) => 'http://private.omdbapi.com/?' + t + '=' + q + '&apikey=' + omdb
-const isprev = p => (((Number(p) - 1) * 10) + 1) !== 1
-const isnext = (p, tot) => !(Number(p) * 10 >= tot || Number(p) * 10 > 1000)
+const clone   = item => JSON.parse(JSON.stringify(item))
+const omdbapi = (t, q, omdb) => 'https://private.omdbapi.com/?' + t + '=' + q + '&apikey=' + omdb
 
-const filtdisk = state => {
-  const disks = [...new Set(state.list.map(x => x.disk))].sort((a,b) => a-b)
-  state.filters.disk = [...['Disk'], ...disks]
-  // if the last movie on a disk has been deleted
-  if (!state.filters.disk.includes(state.filter.disk)) state.filter.disk = 'Disk'
+const api = {
+  opts: (base = {}) => {
+    base.headers = base.headers || {movtok: sessionStorage.getItem('movtok')}
+    return base
+  },
+  req : (what, url, opts) => m.request({method: what, url, ...api.opts(opts)}),
+  get : (url, opts) => api.req('get', url, opts),
+  post: (url, opts) => api.req('post', url, opts),
+  put : (url, opts) => api.req('put', url, opts),
+  del : (url, opts) => api.req('delete', url, opts)
 }
 
-const postprep = qone => {
-  const obj = {}
+const postprep = (qone, obj = {}) => {
   const props = [
     'Actors','Country','Director','Genre','Language','Metascore',
     'Plot','Poster','Runtime','Title','Type','Writer','Year','imdbID',
@@ -26,7 +28,7 @@ const postprep = qone => {
       imdbID:     () => {obj['imdbid']  = qone[x]},
       imdbRating: () => {obj['rating']  = qone[x]}
     }
-    if (actions.hasOwnProperty(x)) actions[x]()
+    if (x in actions) actions[x]()
     else obj[x.toLowerCase()] = qone[x]
   })
   obj['originaltitle'] = ''
@@ -38,121 +40,119 @@ const postprep = qone => {
 
 const update = (movie, res) => new Promise((rs,rj) => {
   if (movie.rating !== res.imdbRating || movie.metascore !== res.Metascore || movie.poster !== res.Poster ||
-      (movie.type === 'series' && Number(res.totalSeasons) > movie.seasonsowned.length)) {
+      (movie.type === 'series' && +res.totalSeasons > movie.seasonsowned.length)) {
     movie.rating    = res.imdbRating
     movie.metascore = res.Metascore
     movie.poster    = res.Poster
-    if (movie.type === 'series' && Number(res.totalSeasons) > movie.seasonsowned.length) {
-      for (let i=0; i < Number(res.totalSeasons) - movie.seasonsowned.length + 1; i++) {
+    if (movie.type === 'series' && +res.totalSeasons > movie.seasonsowned.length) {
+      for (let i=0; i < +res.totalSeasons - movie.seasonsowned.length + 1; i++) {
         movie.seasonsowned.push(false)
         movie.seasonsseen.push(false)
       }
     }
 
-    m.request({
-      method: 'PUT',
-      url: '/' + movie._id,
-      body: movie
-    })
+    api.put('/' + movie._id + '?update=true', {body: movie})
     .then(rs)
     .catch(rj)
   }
   else rs()
 })
 
-const error = (state, err) => {
-  state.modal = {
-    type: 'error',
-    content: {
-      text: `(${err.code}) ${err.response.error.message}`
+const Actions = (S, A = {
+  error: err => {
+    const header = err.code === 403 ? 'Well, what did you expect?' : 'Error'
+    
+    S.modal = {
+      type: 'error',
+      content: {
+        header,
+        text: `(${err.code}) ${err.response.message}`
+      }
     }
-  }
-}
+  },
 
-const Actions = state => ({
+  filtdisk: () => {
+    const disks = [...new Set(S.list.map(x => x.disk))].sort((a,b) => a-b)
+    S.filters.disk = [...['Disk'], ...disks]
+    // if the last movie on a disk has been deleted
+    if (!S.filters.disk.includes(S.filter.disk)) S.filter.disk = 'Disk'
+  },
+
+  login: pass => api.post('/login', {headers: {movtok: 'notok'}, body: {pass}}),
+
   get: () =>
-    m.request('/all')
+    api.get('/all')
     .then(res => {
-      state.list = res.list
-      state.omdb = res.omdb
+      S.list = res.list
+      S.omdb = res.omdb
       // init disk filter array
-      filtdisk(state)
+      A.filtdisk()
       // init checks
-      state.list.forEach(x => state.checks[x._id] = false)
-      state.checks['all'] = false
+      S.list.forEach(x => S.checks[x._id] = false)
+      S.checks['all'] = false
     })
-    .catch(err => error(state, err)),
+    .catch(A.error),
   post: () =>
-    m.request({
-      method: 'POST',
-      url: '/',
-      body: postprep(state.qone)
-    })
+    api.post('/', {body: postprep(S.qone)})
     .then(res => {
-      state.list.push(res)
+      S.list.push(res)
       // re-init disk filter
-      filtdisk(state)
-      state.snackbar = {
+      A.filtdisk()
+      S.snackbar = {
         text: 'Movie/series added.',
         atext: 'view',
         action: () => {
-          state.movie = res
-          state.page = 'info'
-          state.snackbar = null
+          S.movie = res
+          S.page  = 'info'
+          m.route.set('/movie')
+          S.snackbar = null
         }
       }
     })
-    .catch(err => error(state, err)),
+    .catch(A.error),
   put: () =>
-    m.request({
-      method: 'PUT',
-      url: '/' + state.movie._id,
-      body: state.movie
-    })
+    api.put('/' + S.movie._id, {body: S.movie})
     .then(() => {
-      const index = state.list.findIndex(x => x._id === state.movie._id)
-      state.list[index] = clone(state.movie)
+      const index = S.list.findIndex(x => x._id === S.movie._id)
+      S.list[index] = clone(S.movie)
       // re-init disk filter
-      filtdisk(state)
-      state.snackbar = {text: 'Movie(s)/series updated.'}
+      A.filtdisk()
+      S.snackbar = {text: 'Movie(s)/series updated.'}
     })
-    .catch(err => error(state, err)),
+    .catch(A.error),
   del: solo => {
-    if (solo) state.checks[state.movie._id] = true
+    if (solo) S.checks[S.movie._id] = true
 
     const delone = (id, title) =>
-      m.request({
-        method: 'DELETE',
-        url: '/' + id + '/' + title
-      })
+      api.del('/' + id + '/' + title)
       .then(() => {
-        state.list = state.list.filter(x => x._id !== id)
-        state.checks[id] = false
+        S.list = S.list.filter(x => x._id !== id)
+        S.checks[id] = false
         // re-init disk filter
-        filtdisk(state)
+        A.filtdisk()
       })
-      .catch(err => error(state, err))
+      .catch(A.error)
 
     Promise.all(
-      Object.keys(state.checks)
-      .filter(x => state.checks[x])
+      Object.keys(S.checks)
+      .filter(x => S.checks[x])
       .map(x => {
-        const movie = state.list.find(y => y._id === x)
+        const movie = S.list.find(y => y._id === x)
         delone(x, movie.title)
       })
     )
     .then(() => {
-      state.page = 'list'
-      state.snackbar = {text: 'Movie(s)/series deleted.'}
+      S.page = 'list'
+      m.route.set('/list')
+      S.snackbar = {text: 'Movie(s)/series deleted.'}
     })
   },
 
   mm2hm: mins => {
     let time = ''
-    if (Number(mins) !== 0) {
-      const hh = Number(mins) / 60 | 0
-      let mm = Number(mins) % 60
-      if (mm < 10) mm = '0' + mm
+    if (+mins !== 0) {
+      const hh = +mins / 60 | 0
+      const mm = ('0' + (+mins % 60)).slice(-2)
       time = `${hh}:${mm}`
     }
     return time
@@ -160,109 +160,109 @@ const Actions = state => ({
 
   checkit: which => {
     if (which === 'all') {
-      Object.keys(state.checks).forEach(x => state.checks[x] = !state.checks[x])
+      Object.keys(S.checks).forEach(x => S.checks[x] = !S.checks[x])
     }
-    else state.checks[which] = !state.checks[which]
+    else S.checks[which] = !S.checks[which]
   },
 
   selmovie: id => {
-    const index = state.list.findIndex(x => x._id === id)
+    const index = S.list.findIndex(x => x._id === id)
     // update data if needed
-    m.request({url: omdbapi('i', state.list[index].imdbid, state.omdb)})
+    m.request(omdbapi('i', S.list[index].imdbid, S.omdb))
     .then(res => {
-      update(state.list[index], res)
+      update(S.list[index], res)
       .then(() => {
-        state.movie = clone(state.list[index])
-        state.page = 'info'
-        state.season = 0
+        S.movie  = clone(S.list[index])
+        S.page   = 'info'
+        m.route.set('/movie')
+        S.season = 0
       })
-      .catch(err => error(state, err))
+      .catch(A.error)
     })
   },
 
   setfilter: (which, value) => {
-    state.filter[which] = 
-      value === 'Yes' ? true :
+    S.filter[which] = 
+      value === 'Yes' ? true  :
       value === 'No'  ? false :
       value
   },
-  selclear: () => Object.keys(state.filters).forEach(x => state.filter[x] = state.filters[x][0]),
+  selclear: () => Object.keys(S.filters).forEach(x => S.filter[x] = S.filters[x][0]),
 
   seen: () => {
     const seenone = id => {
-      state.list[state.list.findIndex(x => x._id === id)].seen = true
+      S.list[S.list.findIndex(x => x._id === id)].seen = true
 
-      return m.request({
-        method: 'PUT',
-        url: '/' + id,
-        body: state.list[state.list.findIndex(x => x._id === id)]
-      })
+      return api.put('/' + id, {body: S.list[S.list.findIndex(x => x._id === id)]})
       .then(() => {
-        state.checks[id] = false
-        state.snackbar = {text: 'Movie(s)/series updated.'}
+        S.checks[id] = false
+        S.snackbar = {text: 'Movie(s)/series updated.'}
       })
-      .catch(err => error(state, err))
+      .catch(A.error)
     }
 
     Promise.all(
-      Object.keys(state.checks)
-      .filter(x => state.checks[x] === true)
+      Object.keys(S.checks)
+      .filter(x => S.checks[x] === true)
       .map(x => seenone(x))
     )
   },
 
   geteps: nr =>
-    m.request({url: omdbapi('i', state.movie.imdbid + '&Season=' + nr, state.omdb)})
+    m.request(omdbapi('i', S.movie.imdbid + '&Season=' + nr, S.omdb))
     .then(result => {
-      state.eps = result
-      state.season = nr
+      S.eps = result
+      S.season = nr
     })
-    .catch(err => error(state, err)),
+    .catch(A.error),
 
   query: () =>
-    m.request({url: omdbapi('s', state.find, state.omdb)})
+    m.request(omdbapi('s', S.find, S.omdb))
     .then(result => {
-      state.qres = result
-      if (state.qres.Response === 'False') state.show = 'No results.'
+      S.qres = result
+      if (S.qres.Response === 'False') S.show = 'No results.'
       else {
-        if (state.qres.totalResults !== '1') {
-          state.qpage = 1
-          state.show  = 'list'
+        if (S.qres.totalResults !== '1') {
+          S.qpage = 1
+          S.show  = 'list'
         }
         else {
-          m.request({url: omdbapi('i', state.qres.Search[0].imdbID, state.omdb)})
+          m.request(omdbapi('i', S.qres.Search[0].imdbID, S.omdb))
           .then(res => {
-            state.qone = res
-            state.qone.seen = false
-            state.show = 'one'
+            S.qone = res
+            S.qone.seen = false
+            S.show = 'one'
           })
         }
       }
     })
-    .catch(err => error(state, err)),
+    .catch(A.error),
 
   queryid: id =>
-    m.request({url: omdbapi('i', id, state.omdb)})
+    m.request(omdbapi('i', id, S.omdb))
     .then(res => {
-      state.qone = res
-      state.qone.seen = false
-      if (state.qone.totalSeasons) {
-        state.qone.seasonsowned = [...new Array(Number(state.qone.totalSeasons)).fill(false)]
-        state.qone.seasonsseen  = [...new Array(Number(state.qone.totalSeasons)).fill(false)]
+      S.qone = res
+      S.qone.seen = false
+      if (S.qone.totalSeasons) {
+        S.qone.seasonsowned = [...new Array(+S.qone.totalSeasons).fill(false)]
+        S.qone.seasonsseen  = [...new Array(+S.qone.totalSeasons).fill(false)]
       }
     })
-    .catch(err => error(state, err)),
-
-  isporn: porn => porn === 'prev'
-    ? isprev(state.qpage)
-    : isnext(state.qpage, Number(state.qres.totalResults)),
+    .catch(A.error),
+  
+  isprev: p => (((+p - 1) * 10) + 1) !== 1,
+  isnext: (p, tot) => !(+p * 10 >= tot || +p * 10 > 1000),
+  isporn: porn =>
+    porn === 'prev'
+    ? A.isprev(S.qpage)
+    : A.isnext(S.qpage, +S.qres.totalResults),
 
   querypage: porn => {
-    const page = '&page=' + (porn === 'next' ? ++state.qpage : --state.qpage)
-    return m.request({url: omdbapi('s', state.find + page, state.omdb)})
-    .then(result => {state.qres = result})
-    .catch(err => error(state, err))
+    const page = '&page=' + (porn === 'next' ? ++S.qpage : --S.qpage)
+    return m.request(omdbapi('s', S.find + page, S.omdb))
+    .then(result => {S.qres = result})
+    .catch(A.error)
   }
-})
+}) => A
 
 export default Actions

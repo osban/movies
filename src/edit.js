@@ -1,42 +1,43 @@
-import Checkbox from './checkbox'
+import CB from './checkbox'
 
-const Edit = state =>
-  m('div' +b.bsi.p(36,36,0,0),
-    m('div' +b.mb(20),
-      m('label' +b.dib.w(120).fw('bold'), 'title'),
-      m('input' +b.bsi.size(460,32), {
-        oninput: e => state.movie.title = e.target.value,
-        value: state.movie.title
-      })
-    ),
-    m('div' +b.mb(20),
-      m('label' +b.dib.w(120).fw('bold'), 'original title'),
-      m('input' +b.bsi.size(460,32), {
-        oninput: e => state.movie.originaltitle = e.target.value,
-        value: state.movie.originaltitle
-      })
-    ),
-    m('div' +b.mb(20),
-      m('label' +b.dib.w(120).fw('bold').va('top').mt(8), 'notes'),
-      m('textarea' +b.dib.bsi.size(460,64).p(8,8,8,14).ff('Open Sans').fs(14).c('#616161')
-        .resize('none').ofy('auto'), {
-        oninput: e => state.movie.notes = e.target.value,
-        value: state.movie.notes
-      })
-    ),
-    m('div' +b.mb(20),
-      m('label' +b.dib.w(120).fw('bold'), 'disk'),
-      m('input' +b.bsi.size(32,32).pl(0).tac, {
-        oninput: e => state.movie.disk = e.target.value,
-        value: state.movie.disk
-      })
-    ),
-    m('div',
-      m('label' +b.dib.w(120).fw('bold'), 'seen'),
-      m('span' +b.dib.va(-4),
-        Checkbox(state.movie.seen, () => state.movie.seen = !state.movie.seen)
+const Edit = {
+  view: ({attrs: {S}}) =>
+    m('div' +z`bsi; p 36 36 0 0; label {dib; w 120; fw bold}`,
+      m('div' +z`mb 20`,
+        m('label', 'title'),
+        m('input' +z`bsi; size 460 32`, {
+          oninput: e => S.movie.title = e.target.value,
+          value: S.movie.title
+        })
+      ),
+      m('div' +z`mb 20`,
+        m('label', 'original title'),
+        m('input' +z`bsi; size 460 32`, {
+          oninput: e => S.movie.originaltitle = e.target.value,
+          value: S.movie.originaltitle
+        })
+      ),
+      m('div' +z`mb 20`,
+        m('label' +z`va top; mt 8`, 'notes'),
+        m('textarea' +z`dib; bsi; size 460 64; p 8 8 8 14; ff Open Sans; fs 14; c #616161; resize none; ofy auto`, {
+          oninput: e => S.movie.notes = e.target.value,
+          value: S.movie.notes
+        })
+      ),
+      m('div' +z`mb 20`,
+        m('label', 'disk'),
+        m('input' +z`bsi; size 32; pl 0; tac`, {
+          oninput: e => S.movie.disk = e.target.value,
+          value: S.movie.disk
+        })
+      ),
+      m('div',
+        m('label', 'seen'),
+        m('span' +z`dib; va -4`,
+          m(CB, {checked: S.movie.seen, onchange: () => S.movie.seen = !S.movie.seen})
+        )
       )
     )
-  )
+}
 
 export default Edit

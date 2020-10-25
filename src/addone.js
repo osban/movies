@@ -1,75 +1,76 @@
-import Checkbox from './checkbox'
-import Adds     from './adds'
+import CB   from './checkbox'
+import Adds from './adds'
 
-const Addone = (state, actions) =>
-  m('div' +b.ofy('auto').h('calc(100vh - 242px)'),
-    m('div' +b.bsi.p(0,36),
-      m('div' +b.dg.gtc('50%','50%').gtr('auto').gta(`'left right'`),
-        m('div' +b.ga('left'),
-          m('h2',
-            state.qone.Year
-            ? `${state.qone.Title} (${state.qone.Year})`
-            : state.qone.Title
-          ),
-          ['Plot','Director','Writer','Cast'].map(x =>
-            m('div' +b.mb(12),
-              x === 'Plot'
-              ? m('div' +b.fw('bold'), 'plot:')
-              : m('b' +b.mr(6), `${x.toLowerCase()}: `),
-              x === 'Cast'
-              ? m('span', state.qone.Actors)
-              : m('span', state.qone[x])
-            )
-          ),
-          ['Country','Language','Runtime','Genre','Type'].map(x =>
-            m('div', {class: x === 'Genre' ? b.mb(12).class : null},
-              m('b' +b.mr(6), `${x.toLowerCase()}: `),
-              x === 'Runtime'
-              ? m('span', actions.mm2hm(state.qone.Runtime.split(' ')[0] || 0))
-              : m('span', state.qone[x])
-            )
-          ),
-          ['Rating','Metascore','imdb'].map(x =>
-            m('div',
-              m('b' +b.mr(6), `${x.toLowerCase()}: `),
-              x === 'imdb'
-              ? m('a', {
-                  href: `https://www.imdb.com/title/${state.qone.imdbID}`,
-                  target: '_blank'
-                }, `https://www.imdb.com/title/${state.qone.imdbID}`)
-              : x === 'Rating'
-                ? m('span', state.qone.imdbRating)
-                : m('span', state.qone[x])
-            )
-          ),
-          m('div', state.qone.Type === 'series' && Adds(state))
-        ),
-        m('div' +b.ga('right'),
-          m('div' +b.tar.mt(20),
-            m('img' +b.bs('0px 1px 5px 1px rgba(0,0,0,0.5)'), {src: state.qone.Poster}),
-            m('div' +b.tal.m(24,0,0,68),
-              m('label' +b.dib.w(60).fw('bold'), 'disk'),
-              m('input' +b.bsi.size(32,32).pl(0).tac, {
-                oninput: e => state.qone.disk = e.target.value,
-                value: state.qone.disk
-              }),
-              m('span' +b.f('right').m(10,24,0,0),
-                m('a.material-icons' +b.fs(48).c('#616161').pointer
-                  .$hover(b.c('#349cfb')), {
-                  onclick: () => actions.post()
-                }, 'save')
+const Addone = {
+  view: ({attrs: {S,A}}) =>
+    m('div' +z`ofy auto; h calc(100vh - 242px)`,
+      m('div' +z`bsi; p 0 36`,
+        m('div' +z`dg; gtc 50% 50%; gtr auto; gta 'left right'`,
+          m('div' +z`ga left`,
+            m('h2',
+              S.qone.Year
+              ? `${S.qone.Title} (${S.qone.Year})`
+              : S.qone.Title
+            ),
+            ['Plot','Director','Writer','Cast'].map(x =>
+              m('div' +z`mb 12`,
+                x === 'Plot'
+                ? m('div' +z`fw bold`, 'plot:')
+                : m('b' +z`mr 6`, `${x.toLowerCase()}: `),
+                x === 'Cast'
+                ? m('span', S.qone.Actors)
+                : m('span', S.qone[x])
               )
             ),
-            m('div' +b.tal.m(10,0,0,68),
-              m('label' +b.dib.w(60).fw('bold'), 'seen'),
-              m('span' +b.dib.va(-4),
-                Checkbox(state.qone.seen, () => state.qone.seen = !state.qone.seen)
+            ['Country','Language','Runtime','Genre','Type'].map(x =>
+              m('div' +z`${x === 'Genre' ? 'mb 12' : ''}`,
+                m('b' +z`mr 6`, `${x.toLowerCase()}: `),
+                x === 'Runtime'
+                ? m('span', A.mm2hm(S.qone.Runtime.split(' ')[0] || 0))
+                : m('span', S.qone[x])
+              )
+            ),
+            ['Rating','Metascore','imdb'].map(x =>
+              m('div',
+                m('b' +z`mr 6`, `${x.toLowerCase()}: `),
+                x === 'imdb'
+                ? m('a', {
+                    href: `https://www.imdb.com/title/${S.qone.imdbID}`,
+                    target: '_blank'
+                  }, `https://www.imdb.com/title/${S.qone.imdbID}`)
+                : x === 'Rating'
+                  ? m('span', S.qone.imdbRating)
+                  : m('span', S.qone[x])
+              )
+            ),
+            m('div', S.qone.Type === 'series' && m(Adds, {S}))
+          ),
+          m('div' +z`ga right`,
+            m('div' +z`tar; mt 20`,
+              m('img' +z`bs 0 1 5 1 rgba(0,0,0,0.5)`, {src: S.qone.Poster}),
+              m('div' +z`tal; m 24 0 0 68`,
+                m('label' +z`dib; w 60; fw bold`, 'disk'),
+                m('input' +z`bsi; size 32; pl 0; tac`, {
+                  oninput: e => S.qone.disk = e.target.value,
+                  value: S.qone.disk
+                }),
+                m('span' +z`f right; m 10 24 0 0`,
+                  m('a.material-icons' +z`fs 48; c #616161; pointer; :hover {c #349cfb}`, {
+                    onclick: () => A.post()
+                  }, 'save')
+                )
+              ),
+              m('div' +z`tal; m 10 0 0 68`,
+                m('label' +z`dib; w 60; fw bold`, 'seen'),
+                m('span' +z`dib; va -4`,
+                  m(CB, {checked: S.qone.seen, onchange: () => S.qone.seen = !S.qone.seen})
+                )
               )
             )
           )
         )
       )
     )
-  )
+}
 
 export default Addone

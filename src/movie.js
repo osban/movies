@@ -3,66 +3,63 @@ import Infos from './infos'
 import Edit  from './edit'
 import Edits from './edits'
 
-const Movie = (state, actions) =>
-  m('div' +b.tal,
-    m('div' +b.h(36).pl(36).mb(36).bb('1px solid #d2d2d2'),
-      m('span',
-        m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-          onclick: () => state.page = 'list'
-        }, 'home')
-      ),
-      state.page === 'info'
-      ? m('span',
-          m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-            onclick: () => state.page = 'edit'
-          }, 'edit')
-        )
-      : m('span',
-          m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-            onclick: () => state.page = 'info'
-          }, 'visibility')
+const Movie = {
+  view: ({attrs: {S,A}}) =>
+    m('div' +z`tal`,
+      m('div' +z`h 36; pl 36; mb 36; bb 1 solid #d2d2d2; a {mr 24; c #616161; pointer; :hover {c #349cfb}}`,
+        m('span',
+          m('a.material-icons', {
+            onclick: () => {S.page = 'list'; m.route.set('/list')}
+          }, 'home')
         ),
-      m('span',
-        m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#ed2024')), {
-          onclick: () => state.modal = {
-            type: 'delok',
-            content: {
-              text: `Delete ${state.movie.title}?`,
-              click: () => actions.del(true)
+        S.page === 'info'
+        ? m('span',
+            m('a.material-icons', {
+              onclick: () => S.page = 'edit'
+            }, 'edit')
+          )
+        : m('span',
+            m('a.material-icons', {
+              onclick: () => {S.page = 'info'; m.route.set('/movie')}
+            }, 'visibility')
+          ),
+        m('span',
+          m('a.material-icons' +z`:hover {c #ed2024}`, {
+            onclick: () => S.modal = {
+              type: 'delok',
+              content: {
+                text: `Delete ${S.movie.title}?`,
+                click: () => A.del(true)
+              }
             }
-          }
-        }, 'delete')
+          }, 'delete')
+        ),
+        S.page === 'info'
+        ? m('span',
+            m('a.material-icons', {
+              onclick: () => {S.page = 'add'; m.route.set('/add')}
+            }, 'add')
+          )
+        : m('span',
+            m('a.material-icons', {
+              onclick: () => A.put().then(() => {S.page = 'info'; m.route.set('/movie')})
+            }, 'save')
+          )
       ),
-      state.page === 'info'
-      ? m('span',
-          m('a.material-icons' +b.mr(24).c('#616161').pointer.$hover(b.c('#349cfb')), {
-            onclick: () => state.page = 'add'
-          }, 'add')
+      m('div' +z`dg; gtc 67% 33%; gtr auto; gta 'info poster'; ofy auto; h calc(100vh - 217px)`,
+        m('div' +z`ga info; bsi; p 0 36`,
+          S.page === 'info' && m(Info, {S,A}),
+          S.page === 'edit' && m(Edit, {S}),
+          m('div',
+            S.page === 'info' && S.movie.type === 'series'  ? m(Infos, {S,A}) :
+            S.page === 'edit' && S.movie.type === 'series' && m(Edits, {S,A})
+          )
+        ),
+        m('div' +z`ga poster; tac; pt 20`,
+          m('img' +z`bs 0 1 5 1 rgba(0,0,0,0.5)`, {src: S.movie.poster})
         )
-      : m('span',
-          m('a.material-icons' +b.mr(24).c('#616161').pointer
-            .$hover(b.c('#349cfb')), {
-            onclick: () => actions.put().then(() => {state.page = 'info'})
-          }, 'save')
-        )
-    ),
-    m('div' +b.dg.gtc('67%','33%').gtr('auto').gta(`'info poster'`)
-      .ofy('auto').h('calc(100vh - 217px)'),
-      m('div' +b.ga('info').bsi.p(0,36),
-        state.page === 'info' && Info(state, actions),
-        state.page === 'edit' && Edit(state),
-        m('div',
-          state.page === 'info' && state.movie.type === 'series'
-          ? Infos(state, actions)
-          : state.page === 'edit' && state.movie.type === 'series'
-            ? Edits(state, actions)
-            : null
-        )
-      ),
-      m('div' +b.ga('poster').tac.pt(20),
-        m('img' +b.bs('0px 1px 5px 1px rgba(0,0,0,0.5)'), {src: state.movie.poster})
       )
     )
-  )
+}
 
 export default Movie
