@@ -1,4 +1,4 @@
-const Login = ({attrs: {A}}) => {
+const Login = ({attrs: {S,A}}) => {
   sessionStorage.removeItem('movtok')
 
   const texts = [
@@ -11,7 +11,7 @@ const Login = ({attrs: {A}}) => {
     `What's in the box?`,
     'You know what they call a Quarter Pounder with cheese in France?',
     'Who is Keyser Söze?',
-    'Wanna know how I got these scars?'
+    'What is the Matrix?'
   ]
   
   const errors = [
@@ -35,7 +35,7 @@ const Login = ({attrs: {A}}) => {
   let emsg = ''
 
   // wait with showing the prompt
-  setTimeout(() => {show = true; m.redraw()}, (text.length*100) + 200)
+  setTimeout(() => {show = true; m.redraw()}, (text.length*100) + 100)
 
   const engage = () => {
     A.login(pass)
@@ -54,7 +54,10 @@ const Login = ({attrs: {A}}) => {
     })
   }
 
+  let int
+
   return {
+    onremove: () => clearInterval(int),
     view: () => [
       m('div' +z`abs; plt 0; size 100vw 100vh; bc #000; ff VT323; fs 24; c #44ff00; center`,
         m('div' +z`w ${text.length * 10}; tal`,
@@ -67,8 +70,7 @@ const Login = ({attrs: {A}}) => {
           m('div',
             show && m('span', '>'),
             show && m('span#blink', {
-              oncreate: () => setInterval(() => blink.style.visibility = (blink.style.visibility== 'hidden' ? 'visible' : 'hidden'), 500),
-              onremove: () => clearInterval()
+              oncreate: () => int = setInterval(() => blink.style.visibility = (blink.style.visibility== 'hidden' ? 'visible' : 'hidden'), 500)
             }, '_'),
             m('input' +z`rel; bc #000; c transparent; bo 0; caret-color transparent; size 0; :focus {outline 0}; zi -1`, {
               type: 'password',

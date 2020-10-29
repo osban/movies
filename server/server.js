@@ -30,6 +30,13 @@ app.use(auth)
 // set secret string
 app.set('jwtsecret', process.env.JWTSECRET)
 
+// figure out user-agent
+const useragent = (str, arr = str.split(' ').reverse()) =>
+  str.includes('OPR/') || str.includes('Gecko/') || str.includes('Edg/') ? arr[0] : // opera, firefox, edge
+  str.includes('Chrome') ? arr[1] : // chrome
+  str.includes('Gecko)') ? arr[0] : // safari
+  str
+
 // routes
 app.get('/', (req, res) => res.sendFile('index.html'))
 
@@ -42,8 +49,8 @@ app.post('/login', (req, res, next) => {
       exp: Date.now() + (1 * 24 * 60 * 60 * 1000),
       role
     }, app.get('jwtsecret'))
-    logit(`Someone logged in as ${role}`)
-    res.json({token})
+    logit(`Someone logged in as [${role}] - ${useragent(req.headers['user-agent'])}`)
+    res.json({token, role})
   }
   else next(error(401, `Inloggen mislukt`))
 })
@@ -70,7 +77,7 @@ app.put('/:id', (req, res, next) => {
   if (req.role === 'edit' || req.query.update) {
     if (req.body && req.params.id) {
       movies.updateOne(req.params.id, {$set: req.body})
-      .then(x => res.json(x), logit(`PUT --> ${req.body.title}`))
+      .then(x => res.json(x), logit(`${req.query.update ? 'a' : ''}PUT --> ${req.body.title} [${req.role}] - ${useragent(req.headers['user-agent'])}`))
       .catch(next)
     }
     else logit('error put...req.headers:', req.headers)

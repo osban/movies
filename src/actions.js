@@ -59,14 +59,15 @@ const update = (movie, res) => new Promise((rs,rj) => {
 })
 
 const Actions = (S, A = {
-  error: err => {
-    const header = err.code === 403 ? 'Well, what did you expect?' : 'Error'
+  error: ({code, response}) => {
+    const header = code === 403 ? 'Well, what did you expect?' : 'Error'
+    const text = typeof response === 'string' ? response : response.message
     
     S.modal = {
       type: 'error',
       content: {
         header,
-        text: `(${err.code}) ${err.response.message}`
+        text: `(${code}) ${text}`
       }
     }
   },
@@ -77,6 +78,20 @@ const Actions = (S, A = {
     // if the last movie on a disk has been deleted
     if (!S.filters.disk.includes(S.filter.disk)) S.filter.disk = 'Disk'
   },
+
+  // helper for sorting relatie table
+  sort: list => ({
+    onclick: e => {
+      const prop = e.target.getAttribute('sortby')
+      if (prop) {
+        const first = list[0]
+
+        list.sort((a,b) => a[prop] > b[prop] ? 1 : -1)
+
+        if (list[0][prop] === first[prop]) list.reverse()
+      }
+    }
+  }),
 
   login: pass => api.post('/login', {headers: {movtok: 'notok'}, body: {pass}}),
 

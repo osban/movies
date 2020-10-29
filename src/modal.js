@@ -7,7 +7,10 @@ const Content = {
         m('div' +z`fs 14`, m.trust(text)),
         m('div' +z`abs; prb 24 16`,
           m('span.material-icons' +z`c #616161; pointer; :hover {c #33b679}`, {
-            onclick: () => S.modal = null
+            onclick: () => {
+              S.modal = null
+              if (text === '(401) Invalid token') m.route.set('/login')
+            }
           }, 'thumb_up')
         )
       )
