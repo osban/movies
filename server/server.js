@@ -31,11 +31,17 @@ app.use(auth)
 app.set('jwtsecret', process.env.JWTSECRET)
 
 // figure out user-agent
-const useragent = (str, arr = str.split(' ').reverse()) =>
-  str.includes('OPR/') || str.includes('Gecko/') || str.includes('Edg/') ? arr[0] : // opera, firefox, edge
-  str.includes('Chrome') ? arr[1] : // chrome
-  str.includes('Gecko)') ? arr[0] : // safari
-  str
+const useragent = (str, arr = str.split(' ').reverse()) => {
+  if (arr[0].includes(')')) arr = arr.slice(1)
+  if (arr[0].includes('(')) arr = arr.slice(1)
+
+  return (
+    str.includes('OPR/') || str.includes('Gecko/') || str.includes('Edg/') ? arr[0] : // opera, firefox, edge
+    str.includes('Chrome') ? arr[1] : // chrome
+    str.includes('Gecko)') ? arr[0] : // safari
+    str
+  )
+}
 
 // routes
 app.get('/', (req, res) => res.sendFile('index.html'))

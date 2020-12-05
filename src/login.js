@@ -29,7 +29,7 @@ const Login = ({attrs: {S,A}}) => {
   
   const ran = nr => (Math.random() * nr) | 0
 
-  let pass
+  let pass = ''
   let text = texts[ran(10)]
   let show = false
   let emsg = ''
@@ -48,6 +48,7 @@ const Login = ({attrs: {S,A}}) => {
     .catch(err => {
       if (err.code === 401) {
         emsg = errors[ran(10)]
+        pass = ''
         m.redraw()
       }
       else A.error(err)
@@ -59,7 +60,7 @@ const Login = ({attrs: {S,A}}) => {
   return {
     onremove: () => clearInterval(int),
     view: () => [
-      m('div' +z`abs; plt 0; size 100vw 100vh; bc #000; ff VT323; fs 24; c #44ff00; center`,
+      m('div' +z`abs; plt 0; size 100vw 100vh; bc #000; ff VT323; fs 24; c #44ff00; center`, {onclick: () => true},
         m('div' +z`w ${text.length * 10}; tal`,
           m('span', {
             oncreate: ({dom}) => {

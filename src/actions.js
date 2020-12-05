@@ -80,15 +80,22 @@ const Actions = (S, A = {
   },
 
   // helper for sorting relatie table
-  sort: list => ({
+  sort: () => ({
     onclick: e => {
-      const prop = e.target.getAttribute('sortby')
-      if (prop) {
-        const first = list[0]
+      S.sort = e.target.getAttribute('sortby')
 
-        list.sort((a,b) => a[prop] > b[prop] ? 1 : -1)
+      if (S.sort) {
+        const first = S.list[0]
 
-        if (list[0][prop] === first[prop]) list.reverse()
+        S.list = S.list.sort((a,b) =>
+          S.sort === 'idasc'   ? (a._id < b._id ? 1 : -1)  :
+          S.sort === 'iddesc'  ? (a._id > b._id ? 1 : -1)  :
+          S.sort === 'runtime' ? (+a.runtime - +b.runtime) :
+          S.sort === 'disk'    ? (+a.disk - +b.disk)       :
+          (a[S.sort].toLowerCase() > b[S.sort].toLowerCase() ? 1 : -1)
+        )
+
+        if (S.list[0][S.sort] === first[S.sort]) S.list = S.list.reverse()
       }
     }
   }),
@@ -98,7 +105,7 @@ const Actions = (S, A = {
   get: () =>
     api.get('/all')
     .then(res => {
-      S.list = res.list
+      S.list = res.list.sort((a,b) => a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1)
       S.omdb = res.omdb
       // init disk filter array
       A.filtdisk()
@@ -146,7 +153,6 @@ const Actions = (S, A = {
         // re-init disk filter
         A.filtdisk()
       })
-      .catch(A.error)
 
     Promise.all(
       Object.keys(S.checks)
@@ -161,6 +167,7 @@ const Actions = (S, A = {
       m.route.set('/list')
       S.snackbar = {text: 'Movie(s)/series deleted.'}
     })
+    .catch(A.error)
   },
 
   mm2hm: mins => {

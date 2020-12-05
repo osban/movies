@@ -1,8 +1,9 @@
 import CB from './checkbox'
 
 const List = {
+  oninit: ({attrs: {S}}) => {S.sort = 'title'},
   view: ({attrs: {S,A}}) =>
-    m('div',
+    m('div', A.sort(),
       m('div' +z`tal; mb 12`,
         m('span' +z`rel`,
           m('input' +z`bsi; size 300 36; ml 16; pl 40; bo 1 solid #d2d2d2; fs 13`, {
@@ -56,10 +57,10 @@ const List = {
           }, 'cancel')
         ),
         m('span' +z`f right; mt 8`,
-          ['alphabetic','id ascending','id descending'].map(x =>
+          ['title','idasc','iddesc'].map(x =>
             m('span.material-icons' +z`mr 16; ${S.sort === x && 'c #349cfb'}; pointer; :hover {c #349cfb}`, {
-              onclick: () => S.sort = x
-            }, x === 'alphabetic' ? 'sort_by_alpha' : x === 'id ascending' ? 'arrow_upward' : 'arrow_downward')
+              sortby: x
+            }, x === 'title' ? 'sort_by_alpha' : x === 'idasc' ? 'arrow_upward' : 'arrow_downward')
           )
         )
       ),
@@ -70,35 +71,28 @@ const List = {
               m('tr',
                 m('th', ''),
                 m('th' +z`tac`, '#'),
-                m('th' +z`tal`, 'Title'),
-                m('th' +z`tal`, 'Time'),
-                m('th' +z`tal`, 'Year'),
-                m('th' +z`tal`, 'Type'),
-                m('th' +z`tal`, 'Genre'),
-                m('th' +z`tar`, 'Disk'),
+                m('th' +z`tal; pointer; us none`, {sortby: 'title'}, 'Title'),
+                m('th' +z`tal; pointer; us none`, {sortby: 'runtime'}, 'Time'),
+                m('th' +z`tal; pointer; us none`, {sortby: 'year'}, 'Year'),
+                m('th' +z`tal; pointer; us none`, {sortby: 'type'}, 'Type'),
+                m('th' +z`tal; pointer; us none`, {sortby: 'genre'}, 'Genre'),
+                m('th' +z`tar; pointer; us none`, {sortby: 'disk'}, 'Disk'),
                 m('th', 'Seen')
               )
             ),
             m('tbody' +z`td {bsi; p 8 16; h 36; bb 1 solid #f5f5f5}`,
               S.list
               .filter(x =>
-                (S.filter.time  !== '< Time' && A.mm2hm(x.runtime) > S.filter.time)     ||
-                (S.filter.yrgt  !== '> Year' && x.year < S.filter.yrgt)                 ||
-                (S.filter.yrlt  !== '< Year' && x.year > S.filter.yrlt)                 ||
-                (S.filter.type  !== 'Type'   && x.type !== S.filter.type)               ||
-                (S.filter.genre !== 'Genre'  && x.genre.indexOf(S.filter.genre) === -1) ||
-                (S.filter.disk  !== 'Disk'   && x.disk !== S.filter.disk)               ||
-                (S.filter.seen  !== 'Seen'   && x.seen !== S.filter.seen)               ||
+                (S.filter.time  !== '< Time' && A.mm2hm(x.runtime) > S.filter.time) ||
+                (S.filter.yrgt  !== '> Year' && x.year < S.filter.yrgt)             ||
+                (S.filter.yrlt  !== '< Year' && x.year > S.filter.yrlt)             ||
+                (S.filter.type  !== 'Type'   && x.type !== S.filter.type)           ||
+                (S.filter.genre !== 'Genre'  && !x.genre.split(', ').find(x => x === S.filter.genre)) ||
+                (S.filter.disk  !== 'Disk'   && x.disk !== S.filter.disk)           ||
+                (S.filter.seen  !== 'Seen'   && x.seen !== S.filter.seen)           ||
                 (x.title.toLowerCase().indexOf(S.search.toLowerCase()) === -1)
                 ? false
                 : true
-              )
-              .sort((a,b) =>
-                S.sort === 'alphabetic'
-                ? (a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1)
-                : S.sort === 'id ascending'
-                  ? (a._id > b._id ? 1 : -1)
-                  : (a._id < b._id ? 1 : -1)
               )
               .map((x,i) =>
                 m('tr' +z`nowrap; pointer; :hover {bc #efefef}`, {onclick: () => A.selmovie(x._id)},
