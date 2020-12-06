@@ -203,12 +203,7 @@ const Actions = (S, A = {
     })
   },
 
-  setfilter: (which, value) => {
-    S.filter[which] = 
-      value === 'Yes' ? true  :
-      value === 'No'  ? false :
-      value
-  },
+  setfilter: (which, value) => {S.filter[which] = value},
   selclear: () => Object.keys(S.filters).forEach(x => S.filter[x] = S.filters[x][0]),
 
   seen: () => {
@@ -284,7 +279,9 @@ const Actions = (S, A = {
     return m.request(omdbapi('s', S.find + page, S.omdb))
     .then(result => {S.qres = result})
     .catch(A.error)
-  }
+  },
+
+  nosnack: () => S.snackbar = null
 }) => A
 
 export default Actions

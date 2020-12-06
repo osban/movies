@@ -71,7 +71,7 @@ app.post('/', (req, res, next) => {
   if (req.role === 'edit') {
     if (req.body && req.body.title) {
       movies.insertOne(req.body)
-      .then(x => res.json(x), logit(`POST --> ${req.body.title}`))
+      .then(x => res.json(x), logit(`POST --> ${req.body.title} [${req.role}] - ${useragent(req.headers['user-agent'])}`))
       .catch(next)
     }
     else logit('error post...req.headers:', req.headers)
@@ -95,7 +95,7 @@ app.delete('/:id/:title', (req, res, next) => {
   if (req.role === 'edit') {
     if (req.params.id && req.params.title) {
       movies.deleteOne(req.params.id)
-      .then(() => res.json(true), logit(`DELETE --> ${req.params.title}`))
+      .then(() => res.json(true), logit(`DELETE --> ${req.params.title} [${req.role}] - ${useragent(req.headers['user-agent'])}`))
       .catch(next)
     }
     else logit('error delete...req.headers:', req.headers)

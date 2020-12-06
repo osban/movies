@@ -14,6 +14,7 @@ const Add = {
       m('span' +z`rel`,
         m('input' +z`bsi; size 300 36; ml 36; pl 40; bo 1 solid #d2d2d2; fs 13`, {
           placeholder: 'Search title...',
+          oncreate: ({dom}) => dom.focus(),
           onfocus: () => {
             S.show = ''
             S.qres = {}

@@ -14,7 +14,7 @@ const Layout = ({attrs: {A}}) => {
           S.modal && m(Modal, {S}),
           S.snackbar &&
           m('div' +z`abs; plb 50% 0; w 344`,
-            m(Snackbar, S.snackbar)
+            m(Snackbar, {S})
           )
         )
       )

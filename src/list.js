@@ -83,13 +83,13 @@ const List = {
             m('tbody' +z`td {bsi; p 8 16; h 36; bb 1 solid #f5f5f5}`,
               S.list
               .filter(x =>
-                (S.filter.time  !== '< Time' && A.mm2hm(x.runtime) > S.filter.time) ||
-                (S.filter.yrgt  !== '> Year' && x.year < S.filter.yrgt)             ||
-                (S.filter.yrlt  !== '< Year' && x.year > S.filter.yrlt)             ||
-                (S.filter.type  !== 'Type'   && x.type !== S.filter.type)           ||
+                (S.filter.time  !== '< Time' && A.mm2hm(x.runtime) > S.filter.time)                   ||
+                (S.filter.yrgt  !== '> Year' && x.year < S.filter.yrgt)                               ||
+                (S.filter.yrlt  !== '< Year' && x.year > S.filter.yrlt)                               ||
+                (S.filter.type  !== 'Type'   && x.type !== S.filter.type)                             ||
                 (S.filter.genre !== 'Genre'  && !x.genre.split(', ').find(x => x === S.filter.genre)) ||
-                (S.filter.disk  !== 'Disk'   && x.disk !== S.filter.disk)           ||
-                (S.filter.seen  !== 'Seen'   && x.seen !== S.filter.seen)           ||
+                (S.filter.disk  !== 'Disk'   && x.disk !== S.filter.disk)                             ||
+                (S.filter.seen  !== 'Seen'   && (x.seen ? 'Yes' : 'No') !== S.filter.seen)            ||
                 (x.title.toLowerCase().indexOf(S.search.toLowerCase()) === -1)
                 ? false
                 : true
